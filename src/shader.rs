@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use std::ffi::{CString, CStr};
+use std::ffi::{CStr, CString};
 use std::fs::File;
 use std::io::Read;
 use std::ptr;
@@ -8,8 +8,8 @@ use std::str;
 use gl;
 use gl::types::*;
 
-use cgmath::{Matrix, Matrix4, Vector3};
 use cgmath::prelude::*;
+use cgmath::{Matrix, Matrix4, Vector3};
 
 pub struct Shader {
     pub ID: u32,
@@ -19,7 +19,6 @@ pub struct Shader {
 /// a few more setters for uniforms)
 #[allow(dead_code)]
 impl Shader {
-
     pub fn new(vShaderCode: CString, fShaderCode: CString) -> Shader {
         let mut shader = Shader { ID: 0 };
 
@@ -52,10 +51,10 @@ impl Shader {
 
     pub fn from_file(vertexPath: &str, fragmentPath: &str) -> Shader {
         // 1. retrieve the vertex/fragment source code from filesystem
-        let mut vShaderFile = File::open(vertexPath)
-            .unwrap_or_else(|_| panic!("Failed to open {}", vertexPath));
-        let mut fShaderFile = File::open(fragmentPath)
-            .unwrap_or_else(|_| panic!("Failed to open {}", fragmentPath));
+        let mut vShaderFile =
+            File::open(vertexPath).unwrap_or_else(|_| panic!("Failed to open {}", vertexPath));
+        let mut fShaderFile =
+            File::open(fragmentPath).unwrap_or_else(|_| panic!("Failed to open {}", fragmentPath));
         let mut vertexCode = String::new();
         let mut fragmentCode = String::new();
         vShaderFile
@@ -92,7 +91,11 @@ impl Shader {
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn setVector3(&self, name: &CStr, value: &Vector3<f32>) {
-        gl::Uniform3fv(gl::GetUniformLocation(self.ID, name.as_ptr()), 1, value.as_ptr());
+        gl::Uniform3fv(
+            gl::GetUniformLocation(self.ID, name.as_ptr()),
+            1,
+            value.as_ptr(),
+        );
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn setVec3(&self, name: &CStr, x: f32, y: f32, z: f32) {
@@ -100,7 +103,12 @@ impl Shader {
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn setMat4(&self, name: &CStr, mat: &Matrix4<f32>) {
-        gl::UniformMatrix4fv(gl::GetUniformLocation(self.ID, name.as_ptr()), 1, gl::FALSE, mat.as_ptr());
+        gl::UniformMatrix4fv(
+            gl::GetUniformLocation(self.ID, name.as_ptr()),
+            1,
+            gl::FALSE,
+            mat.as_ptr(),
+        );
     }
 
     /// utility function for checking shader compilation/linking errors.
@@ -112,36 +120,48 @@ impl Shader {
         if type_ != "PROGRAM" {
             gl::GetShaderiv(shader, gl::COMPILE_STATUS, &mut success);
             if success != gl::TRUE as GLint {
-                gl::GetShaderInfoLog(shader, 1024, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
-                println!("ERROR::SHADER_COMPILATION_ERROR of type: {}\n{}\n \
+                gl::GetShaderInfoLog(
+                    shader,
+                    1024,
+                    ptr::null_mut(),
+                    infoLog.as_mut_ptr() as *mut GLchar,
+                );
+                println!(
+                    "ERROR::SHADER_COMPILATION_ERROR of type: {}\n{}\n \
                           -- --------------------------------------------------- -- ",
-                         type_,
-                         str::from_utf8(&infoLog).unwrap());
+                    type_,
+                    str::from_utf8(&infoLog).unwrap()
+                );
             }
-
         } else {
             gl::GetProgramiv(shader, gl::LINK_STATUS, &mut success);
             if success != gl::TRUE as GLint {
-                gl::GetProgramInfoLog(shader, 1024, ptr::null_mut(), infoLog.as_mut_ptr() as *mut GLchar);
-                println!("ERROR::PROGRAM_LINKING_ERROR of type: {}\n{}\n \
+                gl::GetProgramInfoLog(
+                    shader,
+                    1024,
+                    ptr::null_mut(),
+                    infoLog.as_mut_ptr() as *mut GLchar,
+                );
+                println!(
+                    "ERROR::PROGRAM_LINKING_ERROR of type: {}\n{}\n \
                           -- --------------------------------------------------- -- ",
-                         type_,
-                         str::from_utf8(&infoLog).unwrap());
+                    type_,
+                    str::from_utf8(&infoLog).unwrap()
+                );
             }
         }
-
     }
 
     /// Only used in 4.9 Geometry shaders - ignore until then (shader.h in original C++)
     pub fn with_geometry_shader(vertexPath: &str, fragmentPath: &str, geometryPath: &str) -> Self {
         let mut shader = Shader { ID: 0 };
         // 1. retrieve the vertex/fragment source code from filesystem
-        let mut vShaderFile = File::open(vertexPath)
-            .unwrap_or_else(|_| panic!("Failed to open {}", vertexPath));
-        let mut fShaderFile = File::open(fragmentPath)
-            .unwrap_or_else(|_| panic!("Failed to open {}", fragmentPath));
-        let mut gShaderFile = File::open(geometryPath)
-            .unwrap_or_else(|_| panic!("Failed to open {}", geometryPath));
+        let mut vShaderFile =
+            File::open(vertexPath).unwrap_or_else(|_| panic!("Failed to open {}", vertexPath));
+        let mut fShaderFile =
+            File::open(fragmentPath).unwrap_or_else(|_| panic!("Failed to open {}", fragmentPath));
+        let mut gShaderFile =
+            File::open(geometryPath).unwrap_or_else(|_| panic!("Failed to open {}", geometryPath));
         let mut vertexCode = String::new();
         let mut fragmentCode = String::new();
         let mut geometryCode = String::new();
