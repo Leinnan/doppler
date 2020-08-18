@@ -1,14 +1,9 @@
 image: archlinux
 packages:
   - rustup
-  - libasound2-dev
-  - mesa-common-dev
-  - libx11-dev
-  - libxrandr-dev
-  - libxi-dev
-  - xorg-dev
-  - libgl1-mesa-dev
-  - libglu1-mesa-dev
+  - mesa
+  - glu
+  - libx11
 tasks:
   - prepare: |
       rustup toolchain install stable
