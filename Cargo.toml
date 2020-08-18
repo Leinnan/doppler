@@ -1,0 +1,19 @@
+[package]
+name = "doppler"
+version = "0.1.0"
+authors = ["Piotr <siuszko@zoho.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cgmath = "0.16.1"
+gl = "0.10.0"
+glfw = "0.23.0"
+image = "0.19.0"
+# only needed from chapter 3 on
+# tobj = "0.1.6"
+# num = "0.2.0"
+# rand = "0.5.5"
+imgui = "0.4.0"
+imgui-glium-renderer = "0.4.0"
