@@ -1,22 +1,17 @@
-extern crate glfw;
-use self::glfw::{Action, Context, Key};
-
 extern crate gl;
-use self::gl::types::*;
+extern crate glfw;
+extern crate image;
 
+use self::glfw::{Action, Context, Key};
+use self::gl::types::*;
 use std::ffi::CString;
 use std::mem;
 use std::os::raw::c_void;
 use std::ptr;
 use std::sync::mpsc::Receiver;
-
-use std::path::Path;
-
-extern crate image;
-use image::GenericImage;
-
 use cgmath::prelude::*;
-use cgmath::{perspective, vec3, Deg, Matrix4};
+use cgmath::{perspective, vec3, Deg, Matrix4, Rad};
+use image::GenericImageView;
 
 mod consts;
 mod macros;
@@ -52,73 +47,77 @@ pub fn main() {
     // ---------------------------------------
     gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
-    let (shader_object, vao, vbo, ebo, texture) = unsafe {
+    let (shader_object, vbo, vao, texture) = unsafe {
+        gl::Enable(gl::DEPTH_TEST);
         let v_shader = CString::new(consts::VERTEX_SHADER_SRC.as_bytes()).unwrap();
         let f_shader = CString::new(consts::FRAGMENT_SHADER_SRC.as_bytes()).unwrap();
         let shader = crate::shader::Shader::new(v_shader, f_shader);
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
         // HINT: type annotation is crucial since default for float literals is f64
-        let vertices: [f32; 20] = [
-            // positions       // texture coords
-            0.5, 0.5, 0.0, 1.0, 1.0, // top right
-            0.5, -0.5, 0.0, 1.0, 0.0, // bottom right
-            -0.5, -0.5, 0.0, 0.0, 0.0, // bottom left
-            -0.5, 0.5, 0.0, 0.0, 1.0, // top left
-        ];
-        let indices = [
-            // note that we start from 0!
-            0, 1, 3, // first Triangle
-            1, 2, 3, // second Triangle
-        ];
+        let vertices: [f32; 180] = [
+            -0.5, -0.5, -0.5,  0.0, 0.0,
+             0.5, -0.5, -0.5,  1.0, 0.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+            -0.5,  0.5, -0.5,  0.0, 1.0,
+            -0.5, -0.5, -0.5,  0.0, 0.0,
 
-        let (mut vbo, mut vao, mut ebo) = (0, 0, 0);
-        gl::GenVertexArrays(1, &mut vao);
-        gl::GenBuffers(1, &mut vbo);
-        gl::GenBuffers(1, &mut ebo);
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        gl::BindVertexArray(vao);
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+             0.5, -0.5,  0.5,  1.0, 0.0,
+             0.5,  0.5,  0.5,  1.0, 1.0,
+             0.5,  0.5,  0.5,  1.0, 1.0,
+            -0.5,  0.5,  0.5,  0.0, 1.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0,
 
-        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
-            &vertices[0] as *const f32 as *const c_void,
-            gl::STATIC_DRAW,
-        );
+            -0.5,  0.5,  0.5,  1.0, 0.0,
+            -0.5,  0.5, -0.5,  1.0, 1.0,
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+            -0.5,  0.5,  0.5,  1.0, 0.0,
 
-        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-        gl::BufferData(
-            gl::ELEMENT_ARRAY_BUFFER,
-            (indices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
-            &indices[0] as *const i32 as *const c_void,
-            gl::STATIC_DRAW,
-        );
+             0.5,  0.5,  0.5,  1.0, 0.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+             0.5, -0.5, -0.5,  0.0, 1.0,
+             0.5, -0.5, -0.5,  0.0, 1.0,
+             0.5, -0.5,  0.5,  0.0, 0.0,
+             0.5,  0.5,  0.5,  1.0, 0.0,
 
-        let stride = 5 * mem::size_of::<GLfloat>() as GLsizei;
-        // position attribute
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
-        gl::EnableVertexAttribArray(0);
-        // texture coord attribute
-        gl::VertexAttribPointer(
-            1,
-            2,
-            gl::FLOAT,
-            gl::FALSE,
-            stride,
-            (3 * mem::size_of::<GLfloat>()) as *const c_void,
-        );
-        gl::EnableVertexAttribArray(1);
+            -0.5, -0.5, -0.5,  0.0, 1.0,
+             0.5, -0.5, -0.5,  1.0, 1.0,
+             0.5, -0.5,  0.5,  1.0, 0.0,
+             0.5, -0.5,  0.5,  1.0, 0.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0,
+            -0.5, -0.5, -0.5,  0.0, 1.0,
 
-        // note that this is allowed, the call to gl::VertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        gl::BindBuffer(gl::ARRAY_BUFFER, 0);
+            -0.5,  0.5, -0.5,  0.0, 1.0,
+             0.5,  0.5, -0.5,  1.0, 1.0,
+             0.5,  0.5,  0.5,  1.0, 0.0,
+             0.5,  0.5,  0.5,  1.0, 0.0,
+            -0.5,  0.5,  0.5,  0.0, 0.0,
+            -0.5,  0.5, -0.5,  0.0, 1.0
+       ];
+       let (mut vbo, mut vao) = (0, 0);
+       gl::GenVertexArrays(1, &mut vao);
+       gl::GenBuffers(1, &mut vbo);
 
-        // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-        // gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, 0);
+       gl::BindVertexArray(vao);
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        gl::BindVertexArray(0);
+       gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+       gl::BufferData(gl::ARRAY_BUFFER,
+                      (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
+                      &vertices[0] as *const f32 as *const c_void,
+                      gl::STATIC_DRAW);
+
+       let stride = 5 * mem::size_of::<GLfloat>() as GLsizei;
+       // position attribute
+       gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
+       gl::EnableVertexAttribArray(0);
+       // texture coord attribute
+       gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, stride, (3 * mem::size_of::<GLfloat>()) as *const c_void);
+       gl::EnableVertexAttribArray(1);
+
 
         // uncomment this call to draw in wireframe polygons.
         // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
@@ -134,23 +133,24 @@ pub fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
         // load image, create texture and generate mipmaps
-        let img = image::open(&Path::new("resources/garlic_dog_space.jpg"))
-            .expect("Failed to load texture");
-        let flipped = img.flipv();
-        let data = flipped.raw_pixels();
+        let img = image::open("resources/garlic_dog_space.jpg").unwrap().flipv();
+        let data = img.raw_pixels();
+
+        // let data = flipped
+        let dimensions = (img.width(), img.height());
         gl::TexImage2D(
             gl::TEXTURE_2D,
             0,
             gl::RGB as i32,
-            img.width() as i32,
-            img.height() as i32,
+            dimensions.0 as i32,
+            dimensions.1 as i32,
             0,
             gl::RGB,
             gl::UNSIGNED_BYTE,
             &data[0] as *const u8 as *const c_void,
         );
         gl::GenerateMipmap(gl::TEXTURE_2D);
-        (shader, vao, vbo, ebo, texture)
+        (shader, vbo, vao, texture)
     };
 
     // render loop
@@ -158,9 +158,13 @@ pub fn main() {
     let color_r = 0.188;
     let color_g = 0.22;
     let color_b = 0.235;
-    let mut view_modifier = 0.5;
+    let mut view_modifier : f32 = 0.5;
+    let mut view_multiplier = 0.01;
     while !window.should_close() {
-        view_modifier = (view_modifier + 0.01) % 1.9;
+        view_modifier = view_modifier + view_multiplier;
+        if view_modifier > 2.0 || view_modifier < 0.0 {
+            view_multiplier = -view_multiplier;
+        }
         // events
         // -----
         process_events(&mut window, &events);
@@ -169,30 +173,28 @@ pub fn main() {
         // ------
         unsafe {
             gl::ClearColor(color_r, color_g, color_b, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
             gl::BindTexture(gl::TEXTURE_2D, texture);
             shader_object.useProgram();
+
             // create transformations
-            let model: Matrix4<f32> = Matrix4::from_angle_x(Deg(-55.));
-            let view: Matrix4<f32> = Matrix4::from_translation(vec3(0., 0., -3. + view_modifier));
-            let projection: Matrix4<f32> = perspective(
-                Deg(45.0),
-                consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32,
-                0.1,
-                100.0,
-            );
+            // NOTE: cgmath requires axis vectors to be normalized!
+            let model: Matrix4<f32> = Matrix4::from_axis_angle(vec3(0.5, 1.0, 0.0).normalize(),
+                                                               Rad(glfw.get_time() as f32));
+            let view: Matrix4<f32> = Matrix4::from_translation(vec3(0., 0., -5.0+view_modifier));
+            let projection: Matrix4<f32> = perspective(Deg(45.0), consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32, 0.1, 100.0);
             // retrieve the matrix uniform locations
-            let model_location = gl::GetUniformLocation(shader_object.ID, c_str!("model").as_ptr());
+            let model_loc = gl::GetUniformLocation(shader_object.ID, c_str!("model").as_ptr());
             let view_loc = gl::GetUniformLocation(shader_object.ID, c_str!("view").as_ptr());
             // pass them to the shaders (3 different ways)
-            gl::UniformMatrix4fv(model_location, 1, gl::FALSE, model.as_ptr());
+            gl::UniformMatrix4fv(model_loc, 1, gl::FALSE, model.as_ptr());
             gl::UniformMatrix4fv(view_loc, 1, gl::FALSE, &view[0][0]);
             // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
             shader_object.setMat4(c_str!("projection"), &projection);
 
-            gl::BindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-            gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
+            gl::BindVertexArray(vao);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -204,7 +206,6 @@ pub fn main() {
     unsafe {
         gl::DeleteVertexArrays(1, &vao);
         gl::DeleteBuffers(1, &vbo);
-        gl::DeleteBuffers(1, &ebo);
     }
 }
 
