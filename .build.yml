@@ -1,0 +1,20 @@
+image: ubuntu
+packages:
+  - rustup
+  - libasound2-dev
+  - mesa-common-dev
+  - libx11-dev
+  - libxrandr-dev
+  - libxi-dev
+  - xorg-dev
+  - libgl1-mesa-dev
+  - libglu1-mesa-dev
+tasks:
+  - prepare: |
+      rustup toolchain install stable
+      cd doppler/
+      rustup run stable cargo fetch
+  - build: |
+      cd doppler/
+      cargo build --release
+
