@@ -8,7 +8,6 @@ use std::ffi::CString;
 use std::mem;
 use std::os::raw::c_void;
 use std::ptr;
-use std::str;
 use std::sync::mpsc::Receiver;
 
 use std::path::Path;
@@ -17,7 +16,7 @@ extern crate image;
 use image::GenericImage;
 
 use cgmath::prelude::*;
-use cgmath::{vec3, Matrix4, Rad};
+use cgmath::{perspective, vec3, Deg, Matrix4};
 
 mod consts;
 mod macros;
@@ -159,7 +158,9 @@ pub fn main() {
     let color_r = 0.188;
     let color_g = 0.22;
     let color_b = 0.235;
+    let mut view_modifier = 0.5;
     while !window.should_close() {
+        view_modifier = (view_modifier + 0.01) % 1.9;
         // events
         // -----
         process_events(&mut window, &events);
@@ -171,16 +172,24 @@ pub fn main() {
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
             gl::BindTexture(gl::TEXTURE_2D, texture);
-            // create transformations
-            let mut transform: Matrix4<f32> = Matrix4::identity();
-            transform = transform * Matrix4::<f32>::from_translation(vec3(0.5, -0.5, 0.0));
-            transform = transform * Matrix4::<f32>::from_angle_z(Rad(glfw.get_time() as f32));
-
-            // get matrix's uniform location and set matrix
             shader_object.useProgram();
-            let transform_loc =
-                gl::GetUniformLocation(shader_object.ID, c_str!("transform").as_ptr());
-            gl::UniformMatrix4fv(transform_loc, 1, gl::FALSE, transform.as_ptr());
+            // create transformations
+            let model: Matrix4<f32> = Matrix4::from_angle_x(Deg(-55.));
+            let view: Matrix4<f32> = Matrix4::from_translation(vec3(0., 0., -3. + view_modifier));
+            let projection: Matrix4<f32> = perspective(
+                Deg(45.0),
+                consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32,
+                0.1,
+                100.0,
+            );
+            // retrieve the matrix uniform locations
+            let model_location = gl::GetUniformLocation(shader_object.ID, c_str!("model").as_ptr());
+            let view_loc = gl::GetUniformLocation(shader_object.ID, c_str!("view").as_ptr());
+            // pass them to the shaders (3 different ways)
+            gl::UniformMatrix4fv(model_location, 1, gl::FALSE, model.as_ptr());
+            gl::UniformMatrix4fv(view_loc, 1, gl::FALSE, &view[0][0]);
+            // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+            shader_object.setMat4(c_str!("projection"), &projection);
 
             gl::BindVertexArray(vao); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
             gl::DrawElements(gl::TRIANGLES, 6, gl::UNSIGNED_INT, ptr::null());
@@ -190,6 +199,12 @@ pub fn main() {
         // -------------------------------------------------------------------------------
         window.swap_buffers();
         glfw.poll_events();
+    }
+
+    unsafe {
+        gl::DeleteVertexArrays(1, &vao);
+        gl::DeleteBuffers(1, &vbo);
+        gl::DeleteBuffers(1, &ebo);
     }
 }
 
