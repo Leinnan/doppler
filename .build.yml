@@ -5,6 +5,7 @@ packages:
   - glu
   - libx11
   - glfw-x11
+  - cmake
 tasks:
   - prepare: |
       rustup toolchain install stable
