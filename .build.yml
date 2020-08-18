@@ -4,6 +4,7 @@ packages:
   - mesa
   - glu
   - libx11
+  - glfw-x11
 tasks:
   - prepare: |
       rustup toolchain install stable
