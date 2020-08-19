@@ -2,6 +2,7 @@ extern crate gl;
 extern crate glfw;
 extern crate image;
 
+use self::camera::*;
 use self::gl::types::*;
 use self::glfw::{Action, Context, Key};
 use cgmath::prelude::*;
@@ -13,6 +14,7 @@ use std::mem;
 use std::os::raw::c_void;
 use std::ptr;
 use std::sync::mpsc::Receiver;
+mod camera;
 mod consts;
 mod macros;
 mod shader;
@@ -32,6 +34,18 @@ const CUBES_POS: [Vector3<f32>; 10] = [
 
 pub fn main() {
     setup_panic!();
+    let mut camera = Camera {
+        Position: Point3::new(0.0, 0.0, 3.0),
+        ..Camera::default()
+    };
+
+    let mut first_mouse = true;
+    let mut last_x: f32 = consts::SCR_WIDTH as f32 / 2.0;
+    let mut last_y: f32 = consts::SCR_HEIGHT as f32 / 2.0;
+
+    // timing
+    let mut delta_time: f32; // time between current frame and last frame
+    let mut last_frame: f32 = 0.0;
     // glfw: initialize and configure
     // ------------------------------
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -153,16 +167,26 @@ pub fn main() {
     let color_r = 0.188;
     let color_g = 0.22;
     let color_b = 0.235;
-    let mut view_modifier: f32 = 0.5;
-    let mut view_multiplier = 0.03;
     while !window.should_close() {
-        view_modifier = view_modifier + view_multiplier;
-        if view_modifier > 5.0 || view_modifier < 0.0 {
-            view_multiplier = -view_multiplier;
-        }
+        // per-frame time logic
+        // --------------------
+        let cur_frame = glfw.get_time() as f32;
+        delta_time = cur_frame - last_frame;
+        last_frame = cur_frame;
+
         // events
         // -----
-        process_events(&mut window, &events);
+        process_events(
+            &events,
+            &mut first_mouse,
+            &mut last_x,
+            &mut last_y,
+            &mut camera,
+        );
+
+        // input
+        // -----
+        process_input(&mut window, delta_time, &mut camera);
 
         // render
         // ------
@@ -173,33 +197,18 @@ pub fn main() {
             gl::BindTexture(gl::TEXTURE_2D, texture);
             shader_object.useProgram();
 
-            // create transformations
-            // NOTE: cgmath requires axis vectors to be normalized!
-            let model: Matrix4<f32> = Matrix4::from_axis_angle(
-                vec3(0.5, 1.0, 0.0).normalize(),
-                Rad(glfw.get_time() as f32),
-            );
-            // camera/view transformation
-            let radius: f32 = 10.0;
-            let time = glfw.get_time() as f32;
-            let cam_pos = Point3::new(time.sin() * radius, view_modifier, time.cos() * radius);
-            let view: Matrix4<f32> =
-                Matrix4::look_at(cam_pos, Point3::new(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
-
+            // pass projection matrix to shader (note that in this case it could change every frame)
             let projection: Matrix4<f32> = perspective(
-                Deg(45.0),
+                Deg(camera.Zoom),
                 consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32,
                 0.1,
                 100.0,
             );
-            // retrieve the matrix uniform locations
-            let model_loc = gl::GetUniformLocation(shader_object.ID, c_str!("model").as_ptr());
-            let view_loc = gl::GetUniformLocation(shader_object.ID, c_str!("view").as_ptr());
-            // pass them to the shaders (3 different ways)
-            gl::UniformMatrix4fv(model_loc, 1, gl::FALSE, model.as_ptr());
-            gl::UniformMatrix4fv(view_loc, 1, gl::FALSE, &view[0][0]);
-            // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
             shader_object.setMat4(c_str!("projection"), &projection);
+
+            // camera/view transformation
+            let view = camera.get_view_matrix();
+            shader_object.setMat4(c_str!("view"), &view);
 
             gl::BindVertexArray(vao);
             for (i, position) in CUBES_POS.iter().enumerate() {
@@ -226,8 +235,13 @@ pub fn main() {
     }
 }
 
-// NOTE: not the same version as in common.rs!
-fn process_events(window: &mut glfw::Window, events: &Receiver<(f64, glfw::WindowEvent)>) {
+pub fn process_events(
+    events: &Receiver<(f64, glfw::WindowEvent)>,
+    first_mouse: &mut bool,
+    last_x: &mut f32,
+    last_y: &mut f32,
+    camera: &mut Camera,
+) {
     for (_, event) in glfw::flush_messages(events) {
         match event {
             glfw::WindowEvent::FramebufferSize(width, height) => {
@@ -235,11 +249,47 @@ fn process_events(window: &mut glfw::Window, events: &Receiver<(f64, glfw::Windo
                 // height will be significantly larger than specified on retina displays.
                 unsafe { gl::Viewport(0, 0, width, height) }
             }
-            glfw::WindowEvent::Key(Key::Escape, _, Action::Press, _) => {
-                window.set_should_close(true)
+            glfw::WindowEvent::CursorPos(xpos, ypos) => {
+                let (xpos, ypos) = (xpos as f32, ypos as f32);
+                if *first_mouse {
+                    *last_x = xpos;
+                    *last_y = ypos;
+                    *first_mouse = false;
+                }
+
+                let xoffset = xpos - *last_x;
+                let yoffset = *last_y - ypos; // reversed since y-coordinates go from bottom to top
+
+                *last_x = xpos;
+                *last_y = ypos;
+
+                camera.process_mouse_movement(xoffset, yoffset, true);
             }
-            glfw::WindowEvent::Key(_, _, Action::Press, _) => println!("Other key pressed"),
+            glfw::WindowEvent::Scroll(_xoffset, yoffset) => {
+                camera.process_mouse_scroll(yoffset as f32);
+            }
             _ => {}
         }
+    }
+}
+
+/// Input processing function as introduced in 1.7.4 (Camera Class) and used in
+/// most later tutorials
+pub fn process_input(window: &mut glfw::Window, delta_time: f32, camera: &mut Camera) {
+    if window.get_key(Key::Escape) == Action::Press {
+        window.set_should_close(true)
+    }
+
+    if window.get_key(Key::W) == Action::Press {
+        camera.process_keyboard(Camera_Movement::FORWARD, delta_time);
+    }
+    if window.get_key(Key::S) == Action::Press {
+        camera.process_keyboard(Camera_Movement::BACKWARD, delta_time);
+    }
+    if window.get_key(Key::A) == Action::Press {
+        camera.process_keyboard(Camera_Movement::LEFT, delta_time);
+    }
+    if window.get_key(Key::D) == Action::Press {
+        camera.process_keyboard(Camera_Movement::RIGHT, delta_time);
     }
 }
