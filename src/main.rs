@@ -2,22 +2,36 @@ extern crate gl;
 extern crate glfw;
 extern crate image;
 
-use self::glfw::{Action, Context, Key};
 use self::gl::types::*;
+use self::glfw::{Action, Context, Key};
+use cgmath::prelude::*;
+use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
+use human_panic::setup_panic;
+use image::GenericImageView;
 use std::ffi::CString;
 use std::mem;
 use std::os::raw::c_void;
 use std::ptr;
 use std::sync::mpsc::Receiver;
-use cgmath::prelude::*;
-use cgmath::{perspective, vec3, Deg, Matrix4, Rad};
-use image::GenericImageView;
-
 mod consts;
 mod macros;
 mod shader;
 
+const CUBES_POS: [Vector3<f32>; 10] = [
+    vec3(0.0, 0.0, 0.0),
+    vec3(2.0, 5.0, -15.0),
+    vec3(-1.5, -2.2, -2.5),
+    vec3(-3.8, -2.0, -12.3),
+    vec3(2.4, -0.4, -3.5),
+    vec3(-1.7, 3.0, -7.5),
+    vec3(1.3, -2.0, -2.5),
+    vec3(1.5, 2.0, -2.5),
+    vec3(1.5, 0.2, -1.5),
+    vec3(-1.3, 1.0, -1.5),
+];
+
 pub fn main() {
+    setup_panic!();
     // glfw: initialize and configure
     // ------------------------------
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -56,68 +70,47 @@ pub fn main() {
         // ------------------------------------------------------------------
         // HINT: type annotation is crucial since default for float literals is f64
         let vertices: [f32; 180] = [
-            -0.5, -0.5, -0.5,  0.0, 0.0,
-             0.5, -0.5, -0.5,  1.0, 0.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-            -0.5,  0.5, -0.5,  0.0, 1.0,
-            -0.5, -0.5, -0.5,  0.0, 0.0,
+            -0.5, -0.5, -0.5, 0.0, 0.0, 0.5, -0.5, -0.5, 1.0, 0.0, 0.5, 0.5, -0.5, 1.0, 1.0, 0.5,
+            0.5, -0.5, 1.0, 1.0, -0.5, 0.5, -0.5, 0.0, 1.0, -0.5, -0.5, -0.5, 0.0, 0.0, -0.5, -0.5,
+            0.5, 0.0, 0.0, 0.5, -0.5, 0.5, 1.0, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.5, 1.0,
+            1.0, -0.5, 0.5, 0.5, 0.0, 1.0, -0.5, -0.5, 0.5, 0.0, 0.0, -0.5, 0.5, 0.5, 1.0, 0.0,
+            -0.5, 0.5, -0.5, 1.0, 1.0, -0.5, -0.5, -0.5, 0.0, 1.0, -0.5, -0.5, -0.5, 0.0, 1.0,
+            -0.5, -0.5, 0.5, 0.0, 0.0, -0.5, 0.5, 0.5, 1.0, 0.0, 0.5, 0.5, 0.5, 1.0, 0.0, 0.5, 0.5,
+            -0.5, 1.0, 1.0, 0.5, -0.5, -0.5, 0.0, 1.0, 0.5, -0.5, -0.5, 0.0, 1.0, 0.5, -0.5, 0.5,
+            0.0, 0.0, 0.5, 0.5, 0.5, 1.0, 0.0, -0.5, -0.5, -0.5, 0.0, 1.0, 0.5, -0.5, -0.5, 1.0,
+            1.0, 0.5, -0.5, 0.5, 1.0, 0.0, 0.5, -0.5, 0.5, 1.0, 0.0, -0.5, -0.5, 0.5, 0.0, 0.0,
+            -0.5, -0.5, -0.5, 0.0, 1.0, -0.5, 0.5, -0.5, 0.0, 1.0, 0.5, 0.5, -0.5, 1.0, 1.0, 0.5,
+            0.5, 0.5, 1.0, 0.0, 0.5, 0.5, 0.5, 1.0, 0.0, -0.5, 0.5, 0.5, 0.0, 0.0, -0.5, 0.5, -0.5,
+            0.0, 1.0,
+        ];
+        let (mut vbo, mut vao) = (0, 0);
+        gl::GenVertexArrays(1, &mut vao);
+        gl::GenBuffers(1, &mut vbo);
 
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-             0.5, -0.5,  0.5,  1.0, 0.0,
-             0.5,  0.5,  0.5,  1.0, 1.0,
-             0.5,  0.5,  0.5,  1.0, 1.0,
-            -0.5,  0.5,  0.5,  0.0, 1.0,
-            -0.5, -0.5,  0.5,  0.0, 0.0,
+        gl::BindVertexArray(vao);
 
-            -0.5,  0.5,  0.5,  1.0, 0.0,
-            -0.5,  0.5, -0.5,  1.0, 1.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-            -0.5,  0.5,  0.5,  1.0, 0.0,
+        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
+            &vertices[0] as *const f32 as *const c_void,
+            gl::STATIC_DRAW,
+        );
 
-             0.5,  0.5,  0.5,  1.0, 0.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-             0.5, -0.5, -0.5,  0.0, 1.0,
-             0.5, -0.5, -0.5,  0.0, 1.0,
-             0.5, -0.5,  0.5,  0.0, 0.0,
-             0.5,  0.5,  0.5,  1.0, 0.0,
-
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-             0.5, -0.5, -0.5,  1.0, 1.0,
-             0.5, -0.5,  0.5,  1.0, 0.0,
-             0.5, -0.5,  0.5,  1.0, 0.0,
-            -0.5, -0.5,  0.5,  0.0, 0.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0,
-
-            -0.5,  0.5, -0.5,  0.0, 1.0,
-             0.5,  0.5, -0.5,  1.0, 1.0,
-             0.5,  0.5,  0.5,  1.0, 0.0,
-             0.5,  0.5,  0.5,  1.0, 0.0,
-            -0.5,  0.5,  0.5,  0.0, 0.0,
-            -0.5,  0.5, -0.5,  0.0, 1.0
-       ];
-       let (mut vbo, mut vao) = (0, 0);
-       gl::GenVertexArrays(1, &mut vao);
-       gl::GenBuffers(1, &mut vbo);
-
-       gl::BindVertexArray(vao);
-
-       gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
-       gl::BufferData(gl::ARRAY_BUFFER,
-                      (vertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
-                      &vertices[0] as *const f32 as *const c_void,
-                      gl::STATIC_DRAW);
-
-       let stride = 5 * mem::size_of::<GLfloat>() as GLsizei;
-       // position attribute
-       gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
-       gl::EnableVertexAttribArray(0);
-       // texture coord attribute
-       gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, stride, (3 * mem::size_of::<GLfloat>()) as *const c_void);
-       gl::EnableVertexAttribArray(1);
-
+        let stride = 5 * mem::size_of::<GLfloat>() as GLsizei;
+        // position attribute
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
+        gl::EnableVertexAttribArray(0);
+        // texture coord attribute
+        gl::VertexAttribPointer(
+            1,
+            2,
+            gl::FLOAT,
+            gl::FALSE,
+            stride,
+            (3 * mem::size_of::<GLfloat>()) as *const c_void,
+        );
+        gl::EnableVertexAttribArray(1);
 
         // uncomment this call to draw in wireframe polygons.
         // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
@@ -133,7 +126,9 @@ pub fn main() {
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
         // load image, create texture and generate mipmaps
-        let img = image::open("resources/garlic_dog_space.jpg").unwrap().flipv();
+        let img = image::open("resources/garlic_dog_space.jpg")
+            .unwrap()
+            .flipv();
         let data = img.raw_pixels();
 
         // let data = flipped
@@ -158,11 +153,11 @@ pub fn main() {
     let color_r = 0.188;
     let color_g = 0.22;
     let color_b = 0.235;
-    let mut view_modifier : f32 = 0.5;
-    let mut view_multiplier = 0.01;
+    let mut view_modifier: f32 = 0.5;
+    let mut view_multiplier = 0.03;
     while !window.should_close() {
         view_modifier = view_modifier + view_multiplier;
-        if view_modifier > 2.0 || view_modifier < 0.0 {
+        if view_modifier > 5.0 || view_modifier < 0.0 {
             view_multiplier = -view_multiplier;
         }
         // events
@@ -180,10 +175,23 @@ pub fn main() {
 
             // create transformations
             // NOTE: cgmath requires axis vectors to be normalized!
-            let model: Matrix4<f32> = Matrix4::from_axis_angle(vec3(0.5, 1.0, 0.0).normalize(),
-                                                               Rad(glfw.get_time() as f32));
-            let view: Matrix4<f32> = Matrix4::from_translation(vec3(0., 0., -5.0+view_modifier));
-            let projection: Matrix4<f32> = perspective(Deg(45.0), consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32, 0.1, 100.0);
+            let model: Matrix4<f32> = Matrix4::from_axis_angle(
+                vec3(0.5, 1.0, 0.0).normalize(),
+                Rad(glfw.get_time() as f32),
+            );
+            // camera/view transformation
+            let radius: f32 = 10.0;
+            let time = glfw.get_time() as f32;
+            let cam_pos = Point3::new(time.sin() * radius, view_modifier, time.cos() * radius);
+            let view: Matrix4<f32> =
+                Matrix4::look_at(cam_pos, Point3::new(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0));
+
+            let projection: Matrix4<f32> = perspective(
+                Deg(45.0),
+                consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32,
+                0.1,
+                100.0,
+            );
             // retrieve the matrix uniform locations
             let model_loc = gl::GetUniformLocation(shader_object.ID, c_str!("model").as_ptr());
             let view_loc = gl::GetUniformLocation(shader_object.ID, c_str!("view").as_ptr());
@@ -194,7 +202,16 @@ pub fn main() {
             shader_object.setMat4(c_str!("projection"), &projection);
 
             gl::BindVertexArray(vao);
-            gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            for (i, position) in CUBES_POS.iter().enumerate() {
+                // calculate the model matrix for each object and pass it to shader before drawing
+                let mut model: Matrix4<f32> = Matrix4::from_translation(*position);
+                let angle = 20.0 * i as f32;
+                model =
+                    model * Matrix4::from_axis_angle(vec3(1.0, 0.3, 0.5).normalize(), Deg(angle));
+                shader_object.setMat4(c_str!("model"), &model);
+
+                gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            }
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
