@@ -45,6 +45,7 @@ impl Model {
     // loads a model from file and stores the resulting meshes in the meshes vector.
     fn loadModel(&mut self, path: &str) {
         let path = Path::new(path);
+        println!("Started loading model from path: {}", path.display());
 
         // retrieve the directory path of the filepath
         self.directory = path.parent().unwrap_or_else(|| Path::new("")).to_str().unwrap().into();
@@ -94,6 +95,7 @@ impl Model {
 
             self.meshes.push(Mesh::new(vertices, indices, textures));
         }
+        println!("Finished loading model from path: {}", path.display());
 
     }
 

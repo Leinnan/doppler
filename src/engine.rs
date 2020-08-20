@@ -12,6 +12,7 @@ use image::GenericImage;
 use image::*;
 
 pub unsafe fn loadTexture(path: &str) -> u32 {
+    println!("Loading texture from path: {}", path);
     let mut textureID = 0;
 
     gl::GenTextures(1, &mut textureID);
