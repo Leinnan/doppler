@@ -14,7 +14,8 @@ lto = true
 [dependencies]
 cgmath = "0.17.0"
 gl = "0.14.0"
-glfw = "0.39.1"
+# glfw = "0.39.1"
+glutin = "0.24.1"
 image = "0.22.5"
 # only needed from chapter 3 on
 tobj = "2.0.2"
