@@ -79,25 +79,25 @@ pub fn main() {
     gl::load_with(|symbol| gl_window.get_proc_address(symbol) as *const _);
 
     
-    let (ourShader, ourModel) = unsafe {
+    let (our_shader, our_model) = unsafe {
         // configure global opengl state
         // -----------------------------
         gl::Enable(gl::DEPTH_TEST);
 
         // build and compile shaders
         // -------------------------
-        let ourShader = shader::Shader::from_file(
+        let our_shader = shader::Shader::from_file(
             "resources/shaders/model_loading.vs",
             "resources/shaders/model_loading.fs");
 
         // load models
         // -----------
-        let ourModel = model::Model::new("resources/objects/nanosuit/nanosuit.obj");
+        let our_model = model::Model::new("resources/objects/planet/planet.obj");
 
         // draw in wireframe
         // gl::PolygonMode(gl::FRONT_AND_BACK, gl::LINE);
 
-        (ourShader, ourModel)
+        (our_shader, our_model)
     };
 
 
@@ -105,6 +105,7 @@ pub fn main() {
     // render loop
     // -----------
     let (r, g, b) = (0.188, 0.22, 0.235);
+    let delta_time = 0.3;
     events_loop.run(move |event, _, control_flow| {
         println!("{:?}", event);
         *control_flow = ControlFlow::Wait;
@@ -118,48 +119,59 @@ pub fn main() {
                 WindowEvent::CloseRequested => {
                     *control_flow = ControlFlow::Exit
                 }
+                WindowEvent::KeyboardInput { input, .. } => {
+                    
+                    let key = if input.virtual_keycode.is_none() {
+                        glutin::event::VirtualKeyCode::Escape
+                    } else {
+                        input.virtual_keycode.unwrap()
+                    };
+                    match key {
+                        glutin::event::VirtualKeyCode::W => {
+                            camera.process_keyboard(Camera_Movement::FORWARD, delta_time);
+                        }
+                        glutin::event::VirtualKeyCode::S => {
+                            camera.process_keyboard(Camera_Movement::BACKWARD, delta_time);
+                        }
+                        glutin::event::VirtualKeyCode::A => {
+                            camera.process_keyboard(Camera_Movement::LEFT, delta_time);
+                        }
+                        glutin::event::VirtualKeyCode::D => {
+                            camera.process_keyboard(Camera_Movement::RIGHT, delta_time);
+                        }
+                        _ => (),
+                    }
+                   println!("{:?}", input);
+                   println!("{:?}", input);
+                   println!("{:?}", input);
+                   println!("{:?}", input);
+                }
                 _ => (),
             },
             Event::RedrawRequested(_) => {
                 unsafe{gl::ClearColor(r, g, b, 1.0);
-                gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);}
+                gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+                        // don't forget to enable shader before setting uniforms
+            our_shader.useProgram();
+
+            // view/projection transformations
+            let projection: Matrix4<f32> = perspective(Deg(camera.Zoom), consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32, 0.1, 100.0);
+            let view = camera.get_view_matrix();
+            our_shader.setMat4(c_str!("projection"), &projection);
+            our_shader.setMat4(c_str!("view"), &view);
+
+            // render the loaded model
+            let mut model = Matrix4::<f32>::from_translation(vec3(0.0, -1.75, 0.0)); // translate it down so it's at the center of the scene
+            model = model * Matrix4::from_scale(0.2);  // it's a bit too big for our scene, so scale it down
+            our_shader.setMat4(c_str!("model"), &model);
+            our_model.Draw(&our_shader);
+                }
                 gl_window.swap_buffers().unwrap();
             }
             _ => (),
         }
     });
-    // events_loop.run_forever(|event| {
 
-    //     if let Event::WindowEvent { event, .. } = event {
-    //         if let WindowEvent::CloseRequested = event {
-    //             return ControlFlow::Exit;
-    //         }
-    //     }
-
-    //     unsafe {
-    //         gl::ClearColor(0.1, 0.1, 0.1, 1.0);
-    //         gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-
-    //         // don't forget to enable shader before setting uniforms
-    //         ourShader.useProgram();
-
-    //         // view/projection transformations
-    //         let projection: Matrix4<f32> = perspective(Deg(camera.Zoom), consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32, 0.1, 100.0);
-    //         let view = camera.get_view_matrix();
-    //         ourShader.setMat4(c_str!("projection"), &projection);
-    //         ourShader.setMat4(c_str!("view"), &view);
-
-    //         // render the loaded model
-    //         let mut model = Matrix4::<f32>::from_translation(vec3(0.0, -1.75, 0.0)); // translate it down so it's at the center of the scene
-    //         model = model * Matrix4::from_scale(0.2);  // it's a bit too big for our scene, so scale it down
-    //         ourShader.setMat4(c_str!("model"), &model);
-    //         ourModel.Draw(&ourShader);
-    //     }
-
-    //     gl_window.swap_buffers().unwrap();
-
-    //     ControlFlow::Continue
-    // });
     // while !window.should_close() {
     //     // per-frame time logic
     //     // --------------------
