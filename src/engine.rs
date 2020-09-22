@@ -3,8 +3,6 @@ use std::path::Path;
 use std::sync::mpsc::Receiver;
 
 use gl;
-extern crate glfw;
-use self::glfw::{Action, Key};
 
 use image;
 use image::DynamicImage::*;

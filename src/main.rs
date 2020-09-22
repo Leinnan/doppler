@@ -1,10 +1,15 @@
 extern crate gl;
-extern crate glfw;
+extern crate imgui_glfw_rs;
 extern crate image;
+// Use the reexported glfw crate to avoid version conflicts.
+use imgui_glfw_rs::glfw;
+// Use the reexported imgui crate to avoid version conflicts.
+use imgui_glfw_rs::imgui;
 
+use imgui_glfw_rs::ImguiGLFW;
 use self::camera::*;
 use self::gl::types::*;
-use self::glfw::{Action, Context, Key};
+use imgui_glfw_rs::glfw::{Action, Context, Key};
 use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
 use human_panic::setup_panic;
@@ -71,6 +76,7 @@ pub fn main() {
         .expect("Failed to create GLFW window");
 
     window.make_current();
+    window.set_all_polling(true);
     window.set_framebuffer_size_polling(true);
     window.set_cursor_pos_polling(true);
     window.set_scroll_polling(true);
@@ -105,26 +111,19 @@ pub fn main() {
     };
 
 
+    let mut imgui = imgui::Context::create();
+
+    let mut imgui_glfw = ImguiGLFW::new(&mut imgui, &mut window);
 
     // render loop
     // -----------
-    let (r, g, b) = (0.188, 0.22, 0.235);
+    let (mut r,mut  g,mut b) = (0.188, 0.22, 0.235);
     while !window.should_close() {
         // per-frame time logic
         // --------------------
         let cur_frame = glfw.get_time() as f32;
         delta_time = cur_frame - last_frame;
         last_frame = cur_frame;
-
-        // events
-        // -----
-        process_events(
-            &events,
-            &mut first_mouse,
-            &mut last_x,
-            &mut last_y,
-            &mut camera,
-        );
 
         // input
         // -----
@@ -133,7 +132,7 @@ pub fn main() {
         // render
         // ------
         unsafe {
-            gl::ClearColor(0.1, 0.1, 0.1, 1.0);
+            gl::ClearColor(r, g, b, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
             // don't forget to enable shader before setting uniforms
@@ -154,46 +153,83 @@ pub fn main() {
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
+        
+        let ui = imgui_glfw.frame(&mut window, &mut imgui);
+
+        {
+            use imgui::*;
+            Window::new(im_str!("Hello world"))
+            .size([300.0, 110.0], Condition::FirstUseEver)
+            .build(&ui, || {
+                ui.text(im_str!("Hello world!"));
+                ui.text(im_str!("こんにちは世界！"));
+                ui.text(im_str!("This...is...imgui-rs!"));
+                ui.separator();
+                ui.text(format!(
+                    "Mouse Position: ({:.1},{:.1})",
+                    last_x, last_y
+                ));
+                imgui::Slider::new(im_str!("r"), 0.0 ..= 1.0)
+                    .build(&ui, &mut r);
+                    imgui::Slider::new(im_str!("g"), 0.0 ..= 1.0)
+                        .build(&ui, &mut g);
+                        imgui::Slider::new(im_str!("b"), 0.0 ..= 1.0)
+                            .build(&ui, &mut b);
+            });
+        }
+
+        imgui_glfw.draw(ui, &mut window);
         window.swap_buffers();
         glfw.poll_events();
+        // events
+        // -----
+        
+        for (_, event) in glfw::flush_messages(&events) {
+            imgui_glfw.handle_event(&mut imgui, &event);
+            process_events(
+                event,
+                &mut first_mouse,
+                &mut last_x,
+                &mut last_y,
+                &mut camera,
+            );
+        }   
     }
 }
 
 pub fn process_events(
-    events: &Receiver<(f64, glfw::WindowEvent)>,
+    event: imgui_glfw_rs::glfw::WindowEvent,
     first_mouse: &mut bool,
     last_x: &mut f32,
     last_y: &mut f32,
     camera: &mut Camera,
 ) {
-    for (_, event) in glfw::flush_messages(events) {
-        match event {
-            glfw::WindowEvent::FramebufferSize(width, height) => {
-                // make sure the viewport matches the new window dimensions; note that width and
-                // height will be significantly larger than specified on retina displays.
-                unsafe { gl::Viewport(0, 0, width, height) }
-            }
-            glfw::WindowEvent::CursorPos(xpos, ypos) => {
-                let (xpos, ypos) = (xpos as f32, ypos as f32);
-                if *first_mouse {
-                    *last_x = xpos;
-                    *last_y = ypos;
-                    *first_mouse = false;
-                }
-
-                let xoffset = xpos - *last_x;
-                let yoffset = *last_y - ypos; // reversed since y-coordinates go from bottom to top
-
+    match event {
+        glfw::WindowEvent::FramebufferSize(width, height) => {
+            // make sure the viewport matches the new window dimensions; note that width and
+            // height will be significantly larger than specified on retina displays.
+            unsafe { gl::Viewport(0, 0, width, height) }
+        }
+        glfw::WindowEvent::CursorPos(xpos, ypos) => {
+            let (xpos, ypos) = (xpos as f32, ypos as f32);
+            if *first_mouse {
                 *last_x = xpos;
                 *last_y = ypos;
+                *first_mouse = false;
+            }
 
-                camera.process_mouse_movement(xoffset, yoffset, true);
-            }
-            glfw::WindowEvent::Scroll(_xoffset, yoffset) => {
-                camera.process_mouse_scroll(yoffset as f32);
-            }
-            _ => {}
+            let xoffset = xpos - *last_x;
+            let yoffset = *last_y - ypos; // reversed since y-coordinates go from bottom to top
+
+            *last_x = xpos;
+            *last_y = ypos;
+
+            camera.process_mouse_movement(xoffset, yoffset, true);
         }
+        glfw::WindowEvent::Scroll(_xoffset, yoffset) => {
+            camera.process_mouse_scroll(yoffset as f32);
+        }
+        _ => {}
     }
 }
 
