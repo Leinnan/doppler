@@ -16,6 +16,8 @@ cgmath = "0.17.0"
 gl = "0.14.0"
 image = "0.22.5"
 imgui-glfw-rs = { git = "https://github.com/Leinnan/imgui-glfw-rs" }
+imgui-inspect = "0.5.0"
+imgui-inspect-derive = "0.5.0"
 # only needed from chapter 3 on
 tobj = "2.0.2"
 num = "0.3.0"

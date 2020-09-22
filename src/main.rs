@@ -5,6 +5,9 @@ extern crate image;
 use imgui_glfw_rs::glfw;
 // Use the reexported imgui crate to avoid version conflicts.
 use imgui_glfw_rs::imgui;
+use imgui_inspect_derive::Inspect;
+use imgui_inspect::InspectArgsStruct;
+use imgui_inspect::InspectArgsSlider;
 
 use imgui_glfw_rs::ImguiGLFW;
 use self::camera::*;
@@ -13,12 +16,6 @@ use imgui_glfw_rs::glfw::{Action, Context, Key};
 use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
 use human_panic::setup_panic;
-use image::GenericImageView;
-use std::ffi::CString;
-use std::mem;
-use std::os::raw::c_void;
-use std::ptr;
-use std::sync::mpsc::Receiver;
 mod camera;
 mod consts;
 mod engine;
@@ -27,18 +24,25 @@ mod shader;
 mod model;
 mod mesh;
 
-const CUBES_POS: [Vector3<f32>; 10] = [
-    vec3(0.0, 0.0, 0.0),
-    vec3(2.0, 5.0, -15.0),
-    vec3(-1.5, -2.2, -2.5),
-    vec3(-3.8, -2.0, -12.3),
-    vec3(2.4, -0.4, -3.5),
-    vec3(-1.7, 3.0, -7.5),
-    vec3(1.3, -2.0, -2.5),
-    vec3(1.5, 2.0, -2.5),
-    vec3(1.5, 0.2, -1.5),
-    vec3(-1.3, 1.0, -1.5),
-];
+#[derive(Inspect)]
+pub struct BgInfo {
+    #[inspect_slider(min_value = 0.0, max_value = 1.0)]
+    pub r : f32,
+    #[inspect_slider(min_value = 0.0, max_value = 1.0)]
+    pub g: f32,
+    #[inspect_slider(min_value = 0.0, max_value = 1.0)]
+    pub b: f32,
+}
+
+impl Default for BgInfo {
+    fn default() -> Self {
+        BgInfo{
+            r: 0.1,
+            g: 0.2,
+            b: 0.4
+        }
+    }
+}
 
 pub fn main() {
     setup_panic!();
@@ -117,7 +121,7 @@ pub fn main() {
 
     // render loop
     // -----------
-    let (mut r,mut  g,mut b) = (0.188, 0.22, 0.235);
+    let mut bg = BgInfo::default();
     while !window.should_close() {
         // per-frame time logic
         // --------------------
@@ -127,12 +131,15 @@ pub fn main() {
 
         // input
         // -----
-        process_input(&mut window, delta_time, &mut camera);
+        let skip_input = imgui.io().want_capture_mouse || imgui.io().want_capture_keyboard;
+        if !skip_input {
+            process_input(&mut window, delta_time, &mut camera);
+        }
 
         // render
         // ------
         unsafe {
-            gl::ClearColor(r, g, b, 1.0);
+            gl::ClearColor(bg.r, bg.g, bg.b, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
             // don't forget to enable shader before setting uniforms
@@ -169,12 +176,24 @@ pub fn main() {
                     "Mouse Position: ({:.1},{:.1})",
                     last_x, last_y
                 ));
-                imgui::Slider::new(im_str!("r"), 0.0 ..= 1.0)
-                    .build(&ui, &mut r);
-                    imgui::Slider::new(im_str!("g"), 0.0 ..= 1.0)
-                        .build(&ui, &mut g);
-                        imgui::Slider::new(im_str!("b"), 0.0 ..= 1.0)
-                            .build(&ui, &mut b);
+                let selected = vec![&bg];
+                <BgInfo as imgui_inspect::InspectRenderStruct<
+                    BgInfo,
+                >>::render(
+                    &selected,
+                    "Example Struct - Read Only",
+                    &ui,
+                    &InspectArgsStruct::default(),
+                );
+                let mut selected_mut = vec![&mut bg];
+                <BgInfo as imgui_inspect::InspectRenderStruct<
+                BgInfo,
+                >>::render_mut(
+                    &mut selected_mut,
+                    "Example Struct - Writable",
+                    &ui,
+                    &InspectArgsStruct::default(),
+                );
             });
         }
 
@@ -192,6 +211,7 @@ pub fn main() {
                 &mut last_x,
                 &mut last_y,
                 &mut camera,
+                skip_input
             );
         }   
     }
@@ -203,6 +223,7 @@ pub fn process_events(
     last_x: &mut f32,
     last_y: &mut f32,
     camera: &mut Camera,
+    skip_input: bool
 ) {
     match event {
         glfw::WindowEvent::FramebufferSize(width, height) => {
@@ -211,6 +232,7 @@ pub fn process_events(
             unsafe { gl::Viewport(0, 0, width, height) }
         }
         glfw::WindowEvent::CursorPos(xpos, ypos) => {
+            if skip_input { return; }
             let (xpos, ypos) = (xpos as f32, ypos as f32);
             if *first_mouse {
                 *last_x = xpos;
@@ -227,6 +249,7 @@ pub fn process_events(
             camera.process_mouse_movement(xoffset, yoffset, true);
         }
         glfw::WindowEvent::Scroll(_xoffset, yoffset) => {
+            if skip_input { return; }
             camera.process_mouse_scroll(yoffset as f32);
         }
         _ => {}
