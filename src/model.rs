@@ -108,7 +108,7 @@ impl Model {
         }
 
         let texture = Texture {
-            id: unsafe { loadTextureFromDir(path, &self.directory) },
+            id: unsafe { load_texture_from_dir(path, &self.directory) },
             type_: typeName.into(),
             path: path.into()
         };

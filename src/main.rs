@@ -27,19 +27,6 @@ mod shader;
 mod model;
 mod mesh;
 
-const CUBES_POS: [Vector3<f32>; 10] = [
-    vec3(0.0, 0.0, 0.0),
-    vec3(2.0, 5.0, -15.0),
-    vec3(-1.5, -2.2, -2.5),
-    vec3(-3.8, -2.0, -12.3),
-    vec3(2.4, -0.4, -3.5),
-    vec3(-1.7, 3.0, -7.5),
-    vec3(1.3, -2.0, -2.5),
-    vec3(1.5, 2.0, -2.5),
-    vec3(1.5, 0.2, -1.5),
-    vec3(-1.3, 1.0, -1.5),
-];
-
 pub fn main() {
     setup_panic!();
     let mut camera = Camera {
@@ -107,8 +94,7 @@ pub fn main() {
     let (r, g, b) = (0.188, 0.22, 0.235);
     let delta_time = 0.3;
     events_loop.run(move |event, _, control_flow| {
-        println!("{:?}", event);
-        *control_flow = ControlFlow::Wait;
+        *control_flow = ControlFlow::Poll;
 
         match event {
             Event::LoopDestroyed => return,
@@ -142,13 +128,10 @@ pub fn main() {
                         _ => (),
                     }
                    println!("{:?}", input);
-                   println!("{:?}", input);
-                   println!("{:?}", input);
-                   println!("{:?}", input);
                 }
                 _ => (),
             },
-            Event::RedrawRequested(_) => {
+            Event::MainEventsCleared => {
                 unsafe{gl::ClearColor(r, g, b, 1.0);
                 gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
                         // don't forget to enable shader before setting uniforms
