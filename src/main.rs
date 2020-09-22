@@ -5,44 +5,20 @@ extern crate image;
 use imgui_glfw_rs::glfw;
 // Use the reexported imgui crate to avoid version conflicts.
 use imgui_glfw_rs::imgui;
-use imgui_inspect_derive::Inspect;
-use imgui_inspect::InspectArgsStruct;
-use imgui_inspect::InspectArgsSlider;
 
 use imgui_glfw_rs::ImguiGLFW;
-use self::camera::*;
+use imgui_inspect::InspectArgsStruct;
 use self::gl::types::*;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
 use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
 use human_panic::setup_panic;
-mod camera;
-mod consts;
-mod engine;
-mod macros;
-mod shader;
-mod model;
-mod mesh;
 
-#[derive(Inspect)]
-pub struct BgInfo {
-    #[inspect_slider(min_value = 0.0, max_value = 1.0)]
-    pub r : f32,
-    #[inspect_slider(min_value = 0.0, max_value = 1.0)]
-    pub g: f32,
-    #[inspect_slider(min_value = 0.0, max_value = 1.0)]
-    pub b: f32,
-}
-
-impl Default for BgInfo {
-    fn default() -> Self {
-        BgInfo{
-            r: 0.1,
-            g: 0.2,
-            b: 0.4
-        }
-    }
-}
+#[macro_use]
+mod gaia;
+use crate::gaia::camera::*;
+use crate::gaia::*;
+use crate::gaia::bg_info::BgInfo;
 
 pub fn main() {
     setup_panic!();
@@ -275,4 +251,5 @@ pub fn process_input(window: &mut glfw::Window, delta_time: f32, camera: &mut Ca
     if window.get_key(Key::D) == Action::Press {
         camera.process_keyboard(Camera_Movement::RIGHT, delta_time);
     }
+    camera.enable_mouse_movement(window.get_key(Key::LeftControl) != Action::Press);
 }

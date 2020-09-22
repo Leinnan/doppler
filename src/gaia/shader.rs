@@ -10,9 +10,19 @@ use gl::types::*;
 
 use cgmath::prelude::*;
 use cgmath::{Matrix, Matrix4, Vector3};
+use crate::gaia::consts;
 
 pub struct Shader {
     pub ID: u32,
+}
+
+impl Default for Shader {
+    fn default() -> Self {
+        let vShaderCode = CString::new(consts::VERTEX_SHADER_SRC.as_bytes()).unwrap();
+        let fShaderCode = CString::new(consts::FRAGMENT_SHADER_SRC.as_bytes()).unwrap();
+
+        Shader::new(vShaderCode, fShaderCode)
+    }
 }
 
 /// NOTE: mixture of `shader_s.h` and `shader_m.h` (the latter just contains

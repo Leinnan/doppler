@@ -138,4 +138,8 @@ impl Camera {
         self.Right = self.Front.cross(self.WorldUp).normalize(); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         self.Up = self.Right.cross(self.Front).normalize();
     }
+
+    pub fn enable_mouse_movement(&mut self, enable: bool) {
+        self.MouseSensitivity = if enable { SENSITIVTY } else { 0.0 };
+    }
 }

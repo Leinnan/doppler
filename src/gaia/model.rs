@@ -13,7 +13,7 @@ use tobj;
 
 use crate::mesh::{ Mesh, Texture, Vertex };
 use crate::shader::Shader;
-use crate::engine::*;
+use crate::utils::*;
 
 // #[derive(Default)]
 pub struct Model {
