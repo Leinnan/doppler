@@ -1,7 +1,7 @@
 use imgui_glfw_rs::imgui;
 use imgui_inspect_derive::Inspect;
 
-#[derive(Inspect)]
+#[derive(Inspect, Clone, Copy)]
 pub struct BgInfo {
     #[inspect_slider(min_value = 0.0, max_value = 1.0)]
     pub r: f32,
