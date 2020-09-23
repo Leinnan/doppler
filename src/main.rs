@@ -5,7 +5,9 @@ extern crate image;
 extern crate imgui_glfw_rs;
 use human_panic::setup_panic;
 mod gaia;
+mod example_client;
 use crate::gaia::engine::Engine;
+use crate::example_client::ExampleClient;
 
 pub fn main() {
     setup_panic!();

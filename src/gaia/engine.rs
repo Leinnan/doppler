@@ -2,6 +2,8 @@ use crate::gaia::bg_info::BgInfo;
 use crate::gaia::camera::*;
 use crate::gaia::consts;
 use crate::gaia::*;
+use crate::example_client::ExampleClient;
+use crate::gaia::client::Client;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
 use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
@@ -20,6 +22,7 @@ pub struct Engine {
     pub imgui_glfw: ImguiGLFW,
     pub shader: shader::Shader,
     pub models: Vec<model::Model>,
+    pub client: Box<dyn Client>,
 }
 
 impl Engine {
@@ -91,6 +94,7 @@ impl Engine {
                     m.Draw(&self.shader);
                     i = i + 1;
                 }
+                self.client.draw();
             }
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -247,10 +251,6 @@ impl Default for Engine {
         unsafe{gl::Enable(gl::DEPTH_TEST);}
 
         Engine {
-            camera: Camera {
-                position: Point3::new(0.0, 0.0, 3.0),
-                ..Camera::default()
-            },
             bg_info: BgInfo::default(),
             window: window,
             window_size: (consts::SCR_WIDTH as f32, consts::SCR_HEIGHT as f32),
@@ -258,8 +258,13 @@ impl Default for Engine {
             glfw: glfw,
             imgui: imgui,
             imgui_glfw: imgui_glfw,
+            camera: Camera {
+                position: Point3::new(0.0, 0.0, 3.0),
+                ..Camera::default()
+            },
             shader: shader::Shader::default(),
             models: vec![],
+            client: Box::new(ExampleClient::create()),
         }
     }
 }

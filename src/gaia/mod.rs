@@ -1,4 +1,5 @@
 pub mod camera;
+pub mod client;
 pub mod consts;
 pub mod utils;
 #[macro_use]
