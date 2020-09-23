@@ -193,6 +193,7 @@ impl Default for Engine {
         let mut imgui = imgui::Context::create();
         {
             use imgui_glfw_rs::imgui::StyleColor;
+            use imgui_glfw_rs::imgui::FontSource;
             let mut style = imgui.style_mut();
             style.scale_all_sizes(1.5);
             style[StyleColor::Text] = [1.0, 1.0, 1.0, 1.0];
@@ -247,6 +248,12 @@ impl Default for Engine {
             style[StyleColor::ModalWindowDimBg]      = [0.80, 0.80, 0.80, 0.35];
             style.grab_rounding = 2.3;
             style.frame_rounding = style.grab_rounding;
+            imgui.fonts().clear();
+            imgui.fonts().add_font(&[FontSource::TtfData {
+                data: include_bytes!("../../resources/FiraSans-SemiBold.ttf"),
+                size_pixels: 19.0,
+                config: None,
+            }]);
         }
         let mut imgui_glfw = ImguiGLFW::new(&mut imgui, &mut window);
         // configure global opengl state
