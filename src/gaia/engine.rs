@@ -20,8 +20,6 @@ pub struct Engine {
     pub glfw: imgui_glfw_rs::glfw::Glfw,
     pub imgui: imgui::Context,
     pub imgui_glfw: ImguiGLFW,
-    pub shader: shader::Shader,
-    pub models: Vec<model::Model>,
     pub client: Box<dyn Client>,
 }
 
@@ -34,20 +32,6 @@ impl Engine {
         // timing
         let mut delta_time: f32; // time between current frame and last frame
         let mut last_frame: f32 = 0.0;
-        {
-            // build and compile shaders
-            // -------------------------
-            self.shader = shader::Shader::from_file(
-                "resources/shaders/model_loading.vs",
-                "resources/shaders/model_loading.fs",
-            );
-
-            // load models
-            // -----------
-            for _ in 0..10 {
-                self.models.push(model::Model::new("resources/objects/nanosuit/nanosuit.obj"));   
-            }
-        };
         // render loop
         // -----------
         while !self.window.should_close() {
@@ -71,29 +55,6 @@ impl Engine {
                 gl::ClearColor(self.bg_info.r, self.bg_info.g, self.bg_info.b, 1.0);
                 gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 
-                // don't forget to enable shader before setting uniforms
-                self.shader.useProgram();
-
-                // view/projection transformations
-                let projection: Matrix4<f32> = perspective(
-                    Deg(self.camera.Zoom),
-                    self.window_size.0 / self.window_size.1,
-                    0.1,
-                    100.0,
-                );
-                let view = self.camera.get_view_matrix();
-                self.shader.setMat4(c_str!("projection"), &projection);
-                self.shader.setMat4(c_str!("view"), &view);
-
-                let mut i = 0;
-                for m in &self.models {
-                    // render the loaded model
-                    let mut model = Matrix4::<f32>::from_translation(vec3(0.0, -1.75, -1.25 * (i as f32))); // translate it down so it's at the center of the scene
-                    model = model * Matrix4::from_scale(0.2); // it's a bit too big for our scene, so scale it down
-                    self.shader.setMat4(c_str!("model"), &model);
-                    m.Draw(&self.shader);
-                    i = i + 1;
-                }
                 self.client.draw();
             }
 
@@ -142,24 +103,7 @@ impl Engine {
         if self.window.get_key(Key::Escape) == Action::Press {
             self.window.set_should_close(true)
         }
-        if self.window.get_key(Key::W) == Action::Press {
-            self.camera
-                .process_keyboard(Camera_Movement::FORWARD, delta_time);
-        }
-        if self.window.get_key(Key::S) == Action::Press {
-            self.camera
-                .process_keyboard(Camera_Movement::BACKWARD, delta_time);
-        }
-        if self.window.get_key(Key::A) == Action::Press {
-            self.camera
-                .process_keyboard(Camera_Movement::LEFT, delta_time);
-        }
-        if self.window.get_key(Key::D) == Action::Press {
-            self.camera
-                .process_keyboard(Camera_Movement::RIGHT, delta_time);
-        }
-        self.camera
-            .enable_mouse_movement(self.window.get_key(Key::LeftControl) != Action::Press);
+        self.client.process_input(&self.window,delta_time);
     }
 
     pub fn process_events(
@@ -195,13 +139,13 @@ impl Engine {
                     *last_x = xpos;
                     *last_y = ypos;
 
-                    self.camera.process_mouse_movement(xoffset, yoffset, true);
+                    self.client.on_mouse_move(xoffset, yoffset);
                 }
                 glfw::WindowEvent::Scroll(_xoffset, yoffset) => {
                     if skip_input {
                         return;
                     }
-                    self.camera.process_mouse_scroll(yoffset as f32);
+                    self.client.on_mouse_scroll(yoffset as f32);
                 }
                 _ => {}
             }
@@ -262,8 +206,6 @@ impl Default for Engine {
                 position: Point3::new(0.0, 0.0, 3.0),
                 ..Camera::default()
             },
-            shader: shader::Shader::default(),
-            models: vec![],
             client: Box::new(ExampleClient::create()),
         }
     }

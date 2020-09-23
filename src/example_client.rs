@@ -3,6 +3,7 @@ use crate::gaia::camera::*;
 use crate::gaia::consts;
 use crate::gaia::*;
 #[macro_use]
+use imgui_glfw_rs::glfw;
 use crate::gaia::macros;
 use crate::gaia::engine::Engine;
 use crate::gaia::client::Client;
@@ -57,5 +58,35 @@ impl Client for ExampleClient {
     }
     fn update(&mut self, engine: &mut Engine) {
 
+    }
+
+    
+    fn process_input(&mut self, window: &glfw::Window, delta: f32) {
+        use imgui_glfw_rs::glfw::{Action, Key};
+        if window.get_key(Key::W) == Action::Press {
+            self.camera
+                .process_keyboard(Camera_Movement::FORWARD, delta);
+        }
+        if window.get_key(Key::S) == Action::Press {
+            self.camera
+                .process_keyboard(Camera_Movement::BACKWARD, delta);
+        }
+        if window.get_key(Key::A) == Action::Press {
+            self.camera
+                .process_keyboard(Camera_Movement::LEFT, delta);
+        }
+        if window.get_key(Key::D) == Action::Press {
+            self.camera
+                .process_keyboard(Camera_Movement::RIGHT, delta);
+        }
+        self.camera
+            .enable_mouse_movement(window.get_key(Key::LeftControl) != Action::Press);
+    }
+
+    fn on_mouse_scroll(&mut self, yoffset: f32){
+        self.camera.process_mouse_scroll(yoffset as f32);
+    }
+    fn on_mouse_move(&mut self, x: f32, y: f32){
+        self.camera.process_mouse_movement(x, y, true);
     }
 }
