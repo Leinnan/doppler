@@ -29,7 +29,7 @@ const ZOOM: f32 = 45.0;
 
 pub struct Camera {
     // Camera Attributes
-    pub Position: Point3,
+    pub position: Point3,
     pub Front: Vector3,
     pub Up: Vector3,
     pub Right: Vector3,
@@ -46,7 +46,7 @@ pub struct Camera {
 impl Default for Camera {
     fn default() -> Camera {
         let mut camera = Camera {
-            Position: Point3::new(0.0, 0.0, 0.0),
+            position: Point3::new(0.0, 0.0, 0.0),
             Front: vec3(0.0, 0.0, -1.0),
             Up: Vector3::zero(),    // initialized later
             Right: Vector3::zero(), // initialized later
@@ -65,23 +65,23 @@ impl Default for Camera {
 impl Camera {
     /// Returns the view matrix calculated using Eular Angles and the LookAt Matrix
     pub fn get_view_matrix(&self) -> Matrix4 {
-        Matrix4::look_at(self.Position, self.Position + self.Front, self.Up)
+        Matrix4::look_at(self.position, self.position + self.Front, self.Up)
     }
 
     /// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     pub fn process_keyboard(&mut self, direction: Camera_Movement, deltaTime: f32) {
         let velocity = self.MovementSpeed * deltaTime;
         if direction == FORWARD {
-            self.Position += self.Front * velocity;
+            self.position += self.Front * velocity;
         }
         if direction == BACKWARD {
-            self.Position += -(self.Front * velocity);
+            self.position += -(self.Front * velocity);
         }
         if direction == LEFT {
-            self.Position += -(self.Right * velocity);
+            self.position += -(self.Right * velocity);
         }
         if direction == RIGHT {
-            self.Position += self.Right * velocity;
+            self.position += self.Right * velocity;
         }
     }
 

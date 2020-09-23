@@ -11,15 +11,15 @@ use image::DynamicImage::*;
 use image::GenericImage;
 use tobj;
 
-use crate::mesh::{ Mesh, Texture, Vertex };
-use crate::shader::Shader;
-use crate::utils::*;
+use crate::gaia::mesh::{Mesh, Texture, Vertex};
+use crate::gaia::shader::Shader;
+use crate::gaia::utils::*;
 
 // #[derive(Default)]
 pub struct Model {
     /*  Model Data */
     pub meshes: Vec<Mesh>,
-    pub textures_loaded: Vec<Texture>,   // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    pub textures_loaded: Vec<Texture>, // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     directory: String,
 }
 
@@ -27,10 +27,15 @@ impl Model {
     /// constructor, expects a filepath to a 3D model.
     pub fn new(path: &str) -> Model {
         let pathObj = Path::new(path);
-        let mut model = Model{
+        let mut model = Model {
             meshes: Vec::<Mesh>::new(),
             textures_loaded: Vec::<Texture>::new(),
-            directory: pathObj.parent().unwrap_or_else(|| Path::new("")).to_str().unwrap().into()
+            directory: pathObj
+                .parent()
+                .unwrap_or_else(|| Path::new(""))
+                .to_str()
+                .unwrap()
+                .into(),
         };
         model.loadModel(path);
         model
@@ -38,7 +43,9 @@ impl Model {
 
     pub fn Draw(&self, shader: &Shader) {
         for mesh in &self.meshes {
-            unsafe { mesh.Draw(shader); }
+            unsafe {
+                mesh.Draw(shader);
+            }
         }
     }
 
@@ -48,7 +55,12 @@ impl Model {
         println!("Started loading model from path: {}", path.display());
 
         // retrieve the directory path of the filepath
-        self.directory = path.parent().unwrap_or_else(|| Path::new("")).to_str().unwrap().into();
+        self.directory = path
+            .parent()
+            .unwrap_or_else(|| Path::new(""))
+            .to_str()
+            .unwrap()
+            .into();
         let obj = tobj::load_obj(path, true);
 
         let (models, materials) = obj.unwrap();
@@ -63,9 +75,9 @@ impl Model {
             let (p, n, t) = (&mesh.positions, &mesh.normals, &mesh.texcoords);
             for i in 0..num_vertices {
                 vertices.push(Vertex {
-                    Position:  vec3(p[i*3], p[i*3+1], p[i*3+2]),
-                    Normal:    vec3(n[i*3], n[i*3+1], n[i*3+2]),
-                    TexCoords: vec2(t[i*2], t[i*2+1]),
+                    position: vec3(p[i * 3], p[i * 3 + 1], p[i * 3 + 2]),
+                    Normal: vec3(n[i * 3], n[i * 3 + 1], n[i * 3 + 2]),
+                    TexCoords: vec2(t[i * 2], t[i * 2 + 1]),
                     ..Vertex::default()
                 })
             }
@@ -77,17 +89,20 @@ impl Model {
 
                 // 1. diffuse map
                 if !material.diffuse_texture.is_empty() {
-                    let texture = self.loadMaterialTexture(&material.diffuse_texture, "texture_diffuse");
+                    let texture =
+                        self.loadMaterialTexture(&material.diffuse_texture, "texture_diffuse");
                     textures.push(texture);
                 }
                 // 2. specular map
                 if !material.specular_texture.is_empty() {
-                    let texture = self.loadMaterialTexture(&material.specular_texture, "texture_specular");
+                    let texture =
+                        self.loadMaterialTexture(&material.specular_texture, "texture_specular");
                     textures.push(texture);
                 }
                 // 3. normal map
                 if !material.normal_texture.is_empty() {
-                    let texture = self.loadMaterialTexture(&material.normal_texture, "texture_normal");
+                    let texture =
+                        self.loadMaterialTexture(&material.normal_texture, "texture_normal");
                     textures.push(texture);
                 }
                 // NOTE: no height maps
@@ -96,7 +111,6 @@ impl Model {
             self.meshes.push(Mesh::new(vertices, indices, textures));
         }
         println!("Finished loading model from path: {}", path.display());
-
     }
 
     fn loadMaterialTexture(&mut self, path: &str, typeName: &str) -> Texture {
@@ -108,12 +122,11 @@ impl Model {
         }
 
         let texture = Texture {
-            id: unsafe { loadTextureFromDir(path, &self.directory) },
+            id: unsafe { load_texture_from_dir(path, &self.directory) },
             type_: typeName.into(),
-            path: path.into()
+            path: path.into(),
         };
         self.textures_loaded.push(texture.clone());
         texture
     }
 }
-

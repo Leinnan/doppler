@@ -8,9 +8,9 @@ use std::str;
 use gl;
 use gl::types::*;
 
+use crate::gaia::consts;
 use cgmath::prelude::*;
 use cgmath::{Matrix, Matrix4, Vector3};
-use crate::gaia::consts;
 
 pub struct Shader {
     pub ID: u32,

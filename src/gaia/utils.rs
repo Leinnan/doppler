@@ -9,11 +9,11 @@ use image::DynamicImage::*;
 use image::GenericImage;
 use image::*;
 
-pub unsafe fn loadTexture(path: &str) -> u32 {
+pub unsafe fn load_texture(path: &str) -> u32 {
     println!("Loading texture from path: {}", path);
-    let mut textureID = 0;
+    let mut id = 0;
 
-    gl::GenTextures(1, &mut textureID);
+    gl::GenTextures(1, &mut id);
     let img = image::open(&Path::new(path)).expect("Texture failed to load");
     let format = match img {
         ImageLuma8(_) => gl::RED,
@@ -26,7 +26,7 @@ pub unsafe fn loadTexture(path: &str) -> u32 {
     let data = img.raw_pixels();
     let dim = img.dimensions();
 
-    gl::BindTexture(gl::TEXTURE_2D, textureID);
+    gl::BindTexture(gl::TEXTURE_2D, id);
     gl::TexImage2D(
         gl::TEXTURE_2D,
         0,
@@ -49,11 +49,11 @@ pub unsafe fn loadTexture(path: &str) -> u32 {
     );
     gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
-    textureID
+    id
 }
 
-pub unsafe fn loadTextureFromDir(filename: &str, directory: &str) -> u32 {
+pub unsafe fn load_texture_from_dir(filename: &str, directory: &str) -> u32 {
     let fullpath = format!("{}/{}", directory, filename);
 
-    loadTexture(&fullpath)
+    load_texture(&fullpath)
 }
