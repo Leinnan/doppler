@@ -1,12 +1,49 @@
-use crate::gaia::*;
-use crate::gaia::macros;
+use imgui_inspect::InspectArgsDefault;
+use imgui_inspect::InspectRenderDefault;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
 use crate::gaia::model::Model;
 use crate::gaia::shader::Shader;
+use imgui_glfw_rs::imgui;
+use imgui_inspect::*;
+use imgui_inspect_derive::Inspect;
+use imgui_inspect::InspectArgsStruct;
 
+struct cgmathVec3f32;
+impl InspectRenderDefault<Vector3<f32>> for cgmathVec3f32 {
+    fn render(data: &[&Vector3<f32>], label: &'static str, ui: &imgui::Ui, args: &InspectArgsDefault) {
+        ui.text(label);
+        ui.text(format!("{:?}", data));
+    }
+
+    fn render_mut(data: &mut [&mut Vector3<f32>], label: &'static str, ui: &imgui::Ui, args: &InspectArgsDefault) -> bool {
+        use imgui::*;
+        ui.text(label);
+        let mut change = false;
+        for el in data.iter_mut() {
+            change |= ui.input_float(im_str!("x"), &mut el.x)
+                .step(0.01)
+                .step_fast(1.0)
+                .build();
+                change |= ui.input_float(im_str!("y"), &mut el.y)
+                    .step(0.01)
+                    .step_fast(1.0)
+                    .build();
+                    change |= ui.input_float(im_str!("z"), &mut el.z)
+                        .step(0.01)
+                        .step_fast(1.0)
+                        .build();
+        }
+        change
+    }
+}
+
+#[derive(Inspect, Clone)]
 pub struct Transform {
+    #[inspect(proxy_type = "cgmathVec3f32")]
     pub position: Vector3<f32>,
+    #[inspect(proxy_type = "cgmathVec3f32")]
     pub scale: Vector3<f32>,
+    #[inspect(proxy_type = "cgmathVec3f32")]
     pub rotation: Vector3<f32>,
 }
 

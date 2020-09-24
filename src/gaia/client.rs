@@ -8,4 +8,5 @@ pub trait Client {
     fn on_mouse_move(&mut self, x: f32, y: f32);
     // fn draw<T>(&mut self, engine: &mut Engine<T>) where T: Client;
     unsafe fn draw(&mut self);
+    fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui);
 }

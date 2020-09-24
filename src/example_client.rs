@@ -1,6 +1,6 @@
 
 use crate::gaia::camera::*;
-use crate::gaia::{consts,macros};
+use crate::gaia::{consts};
 use crate::gaia::*;
 use imgui_glfw_rs::glfw;
 use crate::gaia::components::{Transform,ModelComponent};
@@ -79,6 +79,23 @@ impl Client for ExampleClient {
         }
         self.camera
             .enable_mouse_movement(window.get_key(Key::LeftControl) != Action::Press);
+    }
+
+    fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui) {
+        use imgui_glfw_rs::imgui;
+        use imgui::*;
+        use imgui_inspect::InspectArgsStruct;
+        Window::new(im_str!("Object info"))
+            .size([250.0, 250.0], Condition::FirstUseEver)
+            .build(&ui, || {
+                let mut selected_mut = vec![&mut self.model.transform];
+                <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
+                    &mut selected_mut,
+                    "Example Struct - Writable",
+                    &ui,
+                    &InspectArgsStruct::default(),
+                );
+            });
     }
 
     fn on_mouse_scroll(&mut self, yoffset: f32){

@@ -1,9 +1,6 @@
 use std::os::raw::c_void;
 use std::path::Path;
-use std::sync::mpsc::Receiver;
-
 use gl;
-
 use image;
 use image::DynamicImage::*;
 use image::GenericImage;

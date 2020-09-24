@@ -64,6 +64,7 @@ impl Engine {
             let ui = self.imgui_glfw.frame(&mut self.window, &mut self.imgui);
 
             {
+                self.client.debug_draw(&ui);
                 use imgui::*;
                 let fps  = 1.0 / delta_time;
                 let mut info = self.bg_info;
