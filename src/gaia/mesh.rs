@@ -1,5 +1,5 @@
-#![allow(non_snake_case)]
 #![allow(dead_code)]
+#![allow(non_snake_case)]
 
 use std::ffi::CString;
 use std::mem::size_of;
@@ -20,23 +20,23 @@ pub struct Vertex {
     // position
     pub position: Vector3<f32>,
     // normal
-    pub Normal: Vector3<f32>,
+    pub normal: Vector3<f32>,
     // texCoords
-    pub TexCoords: Vector2<f32>,
+    pub text_coords: Vector2<f32>,
     // tangent
-    pub Tangent: Vector3<f32>,
+    pub tangent: Vector3<f32>,
     // bitangent
-    pub Bitangent: Vector3<f32>,
+    pub bitangent: Vector3<f32>,
 }
 
 impl Default for Vertex {
     fn default() -> Self {
         Vertex {
             position: Vector3::zero(),
-            Normal: Vector3::zero(),
-            TexCoords: Vector2::zero(),
-            Tangent: Vector3::zero(),
-            Bitangent: Vector3::zero(),
+            normal: Vector3::zero(),
+            text_coords: Vector2::zero(),
+            tangent: Vector3::zero(),
+            bitangent: Vector3::zero(),
         }
     }
 }
@@ -171,7 +171,7 @@ impl Mesh {
             gl::FLOAT,
             gl::FALSE,
             size,
-            offset_of!(Vertex, Normal) as *const c_void,
+            offset_of!(Vertex, normal) as *const c_void,
         );
         // vertex texture coords
         gl::EnableVertexAttribArray(2);
@@ -181,7 +181,7 @@ impl Mesh {
             gl::FLOAT,
             gl::FALSE,
             size,
-            offset_of!(Vertex, TexCoords) as *const c_void,
+            offset_of!(Vertex, text_coords) as *const c_void,
         );
         // vertex tangent
         gl::EnableVertexAttribArray(3);
@@ -191,7 +191,7 @@ impl Mesh {
             gl::FLOAT,
             gl::FALSE,
             size,
-            offset_of!(Vertex, Tangent) as *const c_void,
+            offset_of!(Vertex, tangent) as *const c_void,
         );
         // vertex bitangent
         gl::EnableVertexAttribArray(4);
@@ -201,7 +201,7 @@ impl Mesh {
             gl::FLOAT,
             gl::FALSE,
             size,
-            offset_of!(Vertex, Bitangent) as *const c_void,
+            offset_of!(Vertex, bitangent) as *const c_void,
         );
 
         gl::BindVertexArray(0);

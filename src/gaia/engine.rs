@@ -1,10 +1,9 @@
+use crate::example_client::ExampleClient;
 use crate::gaia::bg_info::BgInfo;
 use crate::gaia::camera::*;
-use crate::gaia::consts;
-use crate::gaia::*;
-use crate::example_client::ExampleClient;
 use crate::gaia::client::Client;
-use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
+use crate::gaia::consts;
+use cgmath::Point3;
 use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
 use imgui_glfw_rs::imgui;
@@ -66,7 +65,7 @@ impl Engine {
             {
                 self.client.debug_draw(&ui);
                 use imgui::*;
-                let fps  = 1.0 / delta_time;
+                let fps = 1.0 / delta_time;
                 let mut info = self.bg_info;
                 Window::new(im_str!("Hello world"))
                     .size([300.0, 110.0], Condition::FirstUseEver)
@@ -107,7 +106,7 @@ impl Engine {
         if self.window.get_key(Key::Escape) == Action::Press {
             self.window.set_should_close(true)
         }
-        self.client.process_input(&self.window,delta_time);
+        self.client.process_input(&self.window, delta_time);
     }
 
     pub fn process_events(
@@ -194,60 +193,60 @@ impl Default for Engine {
 
         let mut imgui = imgui::Context::create();
         {
-            use imgui_glfw_rs::imgui::StyleColor;
             use imgui_glfw_rs::imgui::FontSource;
+            use imgui_glfw_rs::imgui::StyleColor;
             let mut style = imgui.style_mut();
             style.scale_all_sizes(1.5);
             style[StyleColor::Text] = [1.0, 1.0, 1.0, 1.0];
-            style[StyleColor::TextDisabled] = [0.5,0.5,0.5, 1.0];
+            style[StyleColor::TextDisabled] = [0.5, 0.5, 0.5, 1.0];
             style[StyleColor::WindowBg] = [0.13, 0.14, 0.15, 1.0];
             style[StyleColor::ChildBg] = [0.13, 0.14, 0.15, 1.0];
             style[StyleColor::PopupBg] = [0.13, 0.14, 0.15, 1.0];
             style[StyleColor::Border] = [0.43, 0.43, 0.50, 0.50];
-            style[StyleColor::BorderShadow]          = [0.00, 0.00, 0.00, 0.00];
-            style[StyleColor::FrameBg]               = [0.25, 0.25, 0.25, 1.00];
-            style[StyleColor::FrameBgHovered]        = [0.38, 0.38, 0.38, 1.00];
-            style[StyleColor::FrameBgActive]         = [0.67, 0.67, 0.67, 0.39];
-            style[StyleColor::TitleBg]               = [0.08, 0.08, 0.09, 1.00];
-            style[StyleColor::TitleBgActive]         = [0.08, 0.08, 0.09, 1.00];
-            style[StyleColor::TitleBgCollapsed]      = [0.00, 0.00, 0.00, 0.51];
-            style[StyleColor::MenuBarBg]             = [0.14, 0.14, 0.14, 1.00];
-            style[StyleColor::ScrollbarBg]           = [0.02, 0.02, 0.02, 0.53];
-            style[StyleColor::ScrollbarGrab]         = [0.31, 0.31, 0.31, 1.00];
-            style[StyleColor::ScrollbarGrabHovered]  = [0.41, 0.41, 0.41, 1.00];
-            style[StyleColor::ScrollbarGrabActive]   = [0.51, 0.51, 0.51, 1.00];
-            style[StyleColor::CheckMark]             = [0.11, 0.64, 0.92, 1.00];
-            style[StyleColor::SliderGrab]            = [0.11, 0.64, 0.92, 1.00];
-            style[StyleColor::SliderGrabActive]      = [0.08, 0.50, 0.72, 1.00];
-            style[StyleColor::Button]                = [0.25, 0.25, 0.25, 1.00];
-            style[StyleColor::ButtonHovered]         = [0.38, 0.38, 0.38, 1.00];
-            style[StyleColor::ButtonActive]          = [0.67, 0.67, 0.67, 0.39];
-            style[StyleColor::Header]                = [0.22, 0.22, 0.22, 1.00];
-            style[StyleColor::HeaderHovered]         = [0.25, 0.25, 0.25, 1.00];
-            style[StyleColor::HeaderActive]          = [0.67, 0.67, 0.67, 0.39];
-            style[StyleColor::Separator]             = style[StyleColor::Border];
-            style[StyleColor::SeparatorHovered]      = [0.41, 0.42, 0.44, 1.00];
-            style[StyleColor::SeparatorActive]       = [0.26, 0.59, 0.98, 0.95];
-            style[StyleColor::ResizeGrip]            = [0.00, 0.00, 0.00, 0.00];
-            style[StyleColor::ResizeGripHovered]     = [0.29, 0.30, 0.31, 0.67];
-            style[StyleColor::ResizeGripActive]      = [0.26, 0.59, 0.98, 0.95];
-            style[StyleColor::Tab]                   = [0.08, 0.08, 0.09, 0.83];
-            style[StyleColor::TabHovered]            = [0.33, 0.34, 0.36, 0.83];
-            style[StyleColor::TabActive]             = [0.23, 0.23, 0.24, 1.00];
-            style[StyleColor::TabUnfocused]          = [0.08, 0.08, 0.09, 1.00];
-            style[StyleColor::TabUnfocusedActive]    = [0.13, 0.14, 0.15, 1.00];
+            style[StyleColor::BorderShadow] = [0.00, 0.00, 0.00, 0.00];
+            style[StyleColor::FrameBg] = [0.25, 0.25, 0.25, 1.00];
+            style[StyleColor::FrameBgHovered] = [0.38, 0.38, 0.38, 1.00];
+            style[StyleColor::FrameBgActive] = [0.67, 0.67, 0.67, 0.39];
+            style[StyleColor::TitleBg] = [0.08, 0.08, 0.09, 1.00];
+            style[StyleColor::TitleBgActive] = [0.08, 0.08, 0.09, 1.00];
+            style[StyleColor::TitleBgCollapsed] = [0.00, 0.00, 0.00, 0.51];
+            style[StyleColor::MenuBarBg] = [0.14, 0.14, 0.14, 1.00];
+            style[StyleColor::ScrollbarBg] = [0.02, 0.02, 0.02, 0.53];
+            style[StyleColor::ScrollbarGrab] = [0.31, 0.31, 0.31, 1.00];
+            style[StyleColor::ScrollbarGrabHovered] = [0.41, 0.41, 0.41, 1.00];
+            style[StyleColor::ScrollbarGrabActive] = [0.51, 0.51, 0.51, 1.00];
+            style[StyleColor::CheckMark] = [0.11, 0.64, 0.92, 1.00];
+            style[StyleColor::SliderGrab] = [0.11, 0.64, 0.92, 1.00];
+            style[StyleColor::SliderGrabActive] = [0.08, 0.50, 0.72, 1.00];
+            style[StyleColor::Button] = [0.25, 0.25, 0.25, 1.00];
+            style[StyleColor::ButtonHovered] = [0.38, 0.38, 0.38, 1.00];
+            style[StyleColor::ButtonActive] = [0.67, 0.67, 0.67, 0.39];
+            style[StyleColor::Header] = [0.22, 0.22, 0.22, 1.00];
+            style[StyleColor::HeaderHovered] = [0.25, 0.25, 0.25, 1.00];
+            style[StyleColor::HeaderActive] = [0.67, 0.67, 0.67, 0.39];
+            style[StyleColor::Separator] = style[StyleColor::Border];
+            style[StyleColor::SeparatorHovered] = [0.41, 0.42, 0.44, 1.00];
+            style[StyleColor::SeparatorActive] = [0.26, 0.59, 0.98, 0.95];
+            style[StyleColor::ResizeGrip] = [0.00, 0.00, 0.00, 0.00];
+            style[StyleColor::ResizeGripHovered] = [0.29, 0.30, 0.31, 0.67];
+            style[StyleColor::ResizeGripActive] = [0.26, 0.59, 0.98, 0.95];
+            style[StyleColor::Tab] = [0.08, 0.08, 0.09, 0.83];
+            style[StyleColor::TabHovered] = [0.33, 0.34, 0.36, 0.83];
+            style[StyleColor::TabActive] = [0.23, 0.23, 0.24, 1.00];
+            style[StyleColor::TabUnfocused] = [0.08, 0.08, 0.09, 1.00];
+            style[StyleColor::TabUnfocusedActive] = [0.13, 0.14, 0.15, 1.00];
             // style[StyleColor::DockingPreview]        = [0.26, 0.59, 0.98, 0.70];
             // style[StyleColor::DockingEmptyBg]        = [0.20, 0.20, 0.20, 1.00];
-            style[StyleColor::PlotLines]             = [0.61, 0.61, 0.61, 1.00];
-            style[StyleColor::PlotLinesHovered]      = [1.00, 0.43, 0.35, 1.00];
-            style[StyleColor::PlotHistogram]         = [0.90, 0.70, 0.00, 1.00];
-            style[StyleColor::PlotHistogramHovered]  = [1.00, 0.60, 0.00, 1.00];
-            style[StyleColor::TextSelectedBg]        = [0.26, 0.59, 0.98, 0.35];
-            style[StyleColor::DragDropTarget]        = [0.11, 0.64, 0.92, 1.00];
-            style[StyleColor::NavHighlight]          = [0.26, 0.59, 0.98, 1.00];
+            style[StyleColor::PlotLines] = [0.61, 0.61, 0.61, 1.00];
+            style[StyleColor::PlotLinesHovered] = [1.00, 0.43, 0.35, 1.00];
+            style[StyleColor::PlotHistogram] = [0.90, 0.70, 0.00, 1.00];
+            style[StyleColor::PlotHistogramHovered] = [1.00, 0.60, 0.00, 1.00];
+            style[StyleColor::TextSelectedBg] = [0.26, 0.59, 0.98, 0.35];
+            style[StyleColor::DragDropTarget] = [0.11, 0.64, 0.92, 1.00];
+            style[StyleColor::NavHighlight] = [0.26, 0.59, 0.98, 1.00];
             style[StyleColor::NavWindowingHighlight] = [1.00, 1.00, 1.00, 0.70];
-            style[StyleColor::NavWindowingDimBg]     = [0.80, 0.80, 0.80, 0.20];
-            style[StyleColor::ModalWindowDimBg]      = [0.80, 0.80, 0.80, 0.35];
+            style[StyleColor::NavWindowingDimBg] = [0.80, 0.80, 0.80, 0.20];
+            style[StyleColor::ModalWindowDimBg] = [0.80, 0.80, 0.80, 0.35];
             style.grab_rounding = 2.3;
             style.frame_rounding = style.grab_rounding;
             imgui.fonts().clear();
@@ -257,10 +256,12 @@ impl Default for Engine {
                 config: None,
             }]);
         }
-        let mut imgui_glfw = ImguiGLFW::new(&mut imgui, &mut window);
+        let imgui_glfw = ImguiGLFW::new(&mut imgui, &mut window);
         // configure global opengl state
         // -----------------------------
-        unsafe{gl::Enable(gl::DEPTH_TEST);}
+        unsafe {
+            gl::Enable(gl::DEPTH_TEST);
+        }
 
         Engine {
             bg_info: BgInfo::default(),

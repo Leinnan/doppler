@@ -1,10 +1,9 @@
-use std::os::raw::c_void;
-use std::path::Path;
 use gl;
 use image;
 use image::DynamicImage::*;
-use image::GenericImage;
 use image::*;
+use std::os::raw::c_void;
+use std::path::Path;
 
 pub unsafe fn load_texture(path: &str) -> u32 {
     println!("Loading texture from path: {}", path);

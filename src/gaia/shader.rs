@@ -38,18 +38,18 @@ impl Shader {
             let vertex = gl::CreateShader(gl::VERTEX_SHADER);
             gl::ShaderSource(vertex, 1, &vShaderCode.as_ptr(), ptr::null());
             gl::CompileShader(vertex);
-            shader.checkCompileErrors(vertex, "VERTEX");
+            shader.check_compile_errors(vertex, "VERTEX");
             // fragment Shader
             let fragment = gl::CreateShader(gl::FRAGMENT_SHADER);
             gl::ShaderSource(fragment, 1, &fShaderCode.as_ptr(), ptr::null());
             gl::CompileShader(fragment);
-            shader.checkCompileErrors(fragment, "FRAGMENT");
+            shader.check_compile_errors(fragment, "FRAGMENT");
             // shader Program
             let ID = gl::CreateProgram();
             gl::AttachShader(ID, vertex);
             gl::AttachShader(ID, fragment);
             gl::LinkProgram(ID);
-            shader.checkCompileErrors(ID, "PROGRAM");
+            shader.check_compile_errors(ID, "PROGRAM");
             // delete the shaders as they're linked into our program now and no longer necessary
             gl::DeleteShader(vertex);
             gl::DeleteShader(fragment);
@@ -82,7 +82,7 @@ impl Shader {
 
     /// activate the shader
     /// ------------------------------------------------------------------------
-    pub unsafe fn useProgram(&self) {
+    pub unsafe fn use_program(&self) {
         gl::UseProgram(self.ID)
     }
 
@@ -100,7 +100,7 @@ impl Shader {
         gl::Uniform1f(gl::GetUniformLocation(self.ID, name.as_ptr()), value);
     }
     /// ------------------------------------------------------------------------
-    pub unsafe fn setVector3(&self, name: &CStr, value: &Vector3<f32>) {
+    pub unsafe fn set_vector3(&self, name: &CStr, value: &Vector3<f32>) {
         gl::Uniform3fv(
             gl::GetUniformLocation(self.ID, name.as_ptr()),
             1,
@@ -108,11 +108,11 @@ impl Shader {
         );
     }
     /// ------------------------------------------------------------------------
-    pub unsafe fn setVec3(&self, name: &CStr, x: f32, y: f32, z: f32) {
+    pub unsafe fn set_vec3(&self, name: &CStr, x: f32, y: f32, z: f32) {
         gl::Uniform3f(gl::GetUniformLocation(self.ID, name.as_ptr()), x, y, z);
     }
     /// ------------------------------------------------------------------------
-    pub unsafe fn setMat4(&self, name: &CStr, mat: &Matrix4<f32>) {
+    pub unsafe fn set_mat4(&self, name: &CStr, mat: &Matrix4<f32>) {
         gl::UniformMatrix4fv(
             gl::GetUniformLocation(self.ID, name.as_ptr()),
             1,
@@ -123,7 +123,7 @@ impl Shader {
 
     /// utility function for checking shader compilation/linking errors.
     /// ------------------------------------------------------------------------
-    unsafe fn checkCompileErrors(&self, shader: u32, type_: &str) {
+    unsafe fn check_compile_errors(&self, shader: u32, type_: &str) {
         let mut is_success = gl::FALSE as GLint;
         let mut infoLog = Vec::with_capacity(1024);
         infoLog.set_len(1024 - 1); // subtract 1 to skip the trailing null character
@@ -195,17 +195,17 @@ impl Shader {
             let vertex = gl::CreateShader(gl::VERTEX_SHADER);
             gl::ShaderSource(vertex, 1, &vShaderCode.as_ptr(), ptr::null());
             gl::CompileShader(vertex);
-            shader.checkCompileErrors(vertex, "VERTEX");
+            shader.check_compile_errors(vertex, "VERTEX");
             // fragment Shader
             let fragment = gl::CreateShader(gl::FRAGMENT_SHADER);
             gl::ShaderSource(fragment, 1, &fShaderCode.as_ptr(), ptr::null());
             gl::CompileShader(fragment);
-            shader.checkCompileErrors(fragment, "FRAGMENT");
+            shader.check_compile_errors(fragment, "FRAGMENT");
             // geometry shader
             let geometry = gl::CreateShader(gl::GEOMETRY_SHADER);
             gl::ShaderSource(geometry, 1, &gShaderCode.as_ptr(), ptr::null());
             gl::CompileShader(geometry);
-            shader.checkCompileErrors(geometry, "GEOMETRY");
+            shader.check_compile_errors(geometry, "GEOMETRY");
 
             // shader Program
             let ID = gl::CreateProgram();
@@ -213,7 +213,7 @@ impl Shader {
             gl::AttachShader(ID, fragment);
             gl::AttachShader(ID, geometry);
             gl::LinkProgram(ID);
-            shader.checkCompileErrors(ID, "PROGRAM");
+            shader.check_compile_errors(ID, "PROGRAM");
             // delete the shaders as they're linked into our program now and no longer necessary
             gl::DeleteShader(vertex);
             gl::DeleteShader(fragment);

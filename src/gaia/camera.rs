@@ -1,5 +1,3 @@
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
 #![allow(dead_code)]
 
 use cgmath;
@@ -12,13 +10,13 @@ type Matrix4 = cgmath::Matrix4<f32>;
 
 // Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
 #[derive(PartialEq, Clone, Copy)]
-pub enum Camera_Movement {
+pub enum CameraMovement {
     FORWARD,
     BACKWARD,
     LEFT,
     RIGHT,
 }
-use self::Camera_Movement::*;
+use self::CameraMovement::*;
 
 // Default camera values
 const YAW: f32 = -90.0;
@@ -30,32 +28,32 @@ const ZOOM: f32 = 45.0;
 pub struct Camera {
     // Camera Attributes
     pub position: Point3,
-    pub Front: Vector3,
-    pub Up: Vector3,
-    pub Right: Vector3,
-    pub WorldUp: Vector3,
+    pub front: Vector3,
+    pub up: Vector3,
+    pub right: Vector3,
+    pub worldup: Vector3,
     // Euler Angles
-    pub Yaw: f32,
-    pub Pitch: f32,
+    pub yaw: f32,
+    pub pitch: f32,
     // Camera options
-    pub MovementSpeed: f32,
-    pub MouseSensitivity: f32,
-    pub Zoom: f32,
+    pub movement_speed: f32,
+    pub mouse_sensivity: f32,
+    pub zoom: f32,
 }
 
 impl Default for Camera {
     fn default() -> Camera {
         let mut camera = Camera {
             position: Point3::new(0.0, 0.0, 0.0),
-            Front: vec3(0.0, 0.0, -1.0),
-            Up: Vector3::zero(),    // initialized later
-            Right: Vector3::zero(), // initialized later
-            WorldUp: Vector3::unit_y(),
-            Yaw: YAW,
-            Pitch: PITCH,
-            MovementSpeed: SPEED,
-            MouseSensitivity: SENSITIVTY,
-            Zoom: ZOOM,
+            front: vec3(0.0, 0.0, -1.0),
+            up: Vector3::zero(),    // initialized later
+            right: Vector3::zero(), // initialized later
+            worldup: Vector3::unit_y(),
+            yaw: YAW,
+            pitch: PITCH,
+            movement_speed: SPEED,
+            mouse_sensivity: SENSITIVTY,
+            zoom: ZOOM,
         };
         camera.update_camera_vectors();
         camera
@@ -65,23 +63,23 @@ impl Default for Camera {
 impl Camera {
     /// Returns the view matrix calculated using Eular Angles and the LookAt Matrix
     pub fn get_view_matrix(&self) -> Matrix4 {
-        Matrix4::look_at(self.position, self.position + self.Front, self.Up)
+        Matrix4::look_at(self.position, self.position + self.front, self.up)
     }
 
     /// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-    pub fn process_keyboard(&mut self, direction: Camera_Movement, deltaTime: f32) {
-        let velocity = self.MovementSpeed * deltaTime;
+    pub fn process_keyboard(&mut self, direction: CameraMovement, delta_time: f32) {
+        let velocity = self.movement_speed * delta_time;
         if direction == FORWARD {
-            self.position += self.Front * velocity;
+            self.position += self.front * velocity;
         }
         if direction == BACKWARD {
-            self.position += -(self.Front * velocity);
+            self.position += -(self.front * velocity);
         }
         if direction == LEFT {
-            self.position += -(self.Right * velocity);
+            self.position += -(self.right * velocity);
         }
         if direction == RIGHT {
-            self.position += self.Right * velocity;
+            self.position += self.right * velocity;
         }
     }
 
@@ -90,56 +88,56 @@ impl Camera {
         &mut self,
         mut xoffset: f32,
         mut yoffset: f32,
-        constrainPitch: bool,
+        constrainpitch: bool,
     ) {
-        xoffset *= self.MouseSensitivity;
-        yoffset *= self.MouseSensitivity;
+        xoffset *= self.mouse_sensivity;
+        yoffset *= self.mouse_sensivity;
 
-        self.Yaw += xoffset;
-        self.Pitch += yoffset;
+        self.yaw += xoffset;
+        self.pitch += yoffset;
 
         // Make sure that when pitch is out of bounds, screen doesn't get flipped
-        if constrainPitch {
-            if self.Pitch > 89.0 {
-                self.Pitch = 89.0;
+        if constrainpitch {
+            if self.pitch > 89.0 {
+                self.pitch = 89.0;
             }
-            if self.Pitch < -89.0 {
-                self.Pitch = -89.0;
+            if self.pitch < -89.0 {
+                self.pitch = -89.0;
             }
         }
 
-        // Update Front, Right and Up Vectors using the updated Eular angles
+        // update front, right and up Vectors using the updated Eular angles
         self.update_camera_vectors();
     }
 
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     pub fn process_mouse_scroll(&mut self, yoffset: f32) {
-        if self.Zoom >= 1.0 && self.Zoom <= 45.0 {
-            self.Zoom -= yoffset;
+        if self.zoom >= 1.0 && self.zoom <= 45.0 {
+            self.zoom -= yoffset;
         }
-        if self.Zoom <= 1.0 {
-            self.Zoom = 1.0;
+        if self.zoom <= 1.0 {
+            self.zoom = 1.0;
         }
-        if self.Zoom >= 45.0 {
-            self.Zoom = 45.0;
+        if self.zoom >= 45.0 {
+            self.zoom = 45.0;
         }
     }
 
     /// Calculates the front vector from the Camera's (updated) Eular Angles
     fn update_camera_vectors(&mut self) {
-        // Calculate the new Front vector
+        // Calculate the new front vector
         let front = Vector3 {
-            x: self.Yaw.to_radians().cos() * self.Pitch.to_radians().cos(),
-            y: self.Pitch.to_radians().sin(),
-            z: self.Yaw.to_radians().sin() * self.Pitch.to_radians().cos(),
+            x: self.yaw.to_radians().cos() * self.pitch.to_radians().cos(),
+            y: self.pitch.to_radians().sin(),
+            z: self.yaw.to_radians().sin() * self.pitch.to_radians().cos(),
         };
-        self.Front = front.normalize();
-        // Also re-calculate the Right and Up vector
-        self.Right = self.Front.cross(self.WorldUp).normalize(); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-        self.Up = self.Right.cross(self.Front).normalize();
+        self.front = front.normalize();
+        // Also re-calculate the right and up vector
+        self.right = self.front.cross(self.worldup).normalize(); // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+        self.up = self.right.cross(self.front).normalize();
     }
 
     pub fn enable_mouse_movement(&mut self, enable: bool) {
-        self.MouseSensitivity = if enable { SENSITIVTY } else { 0.0 };
+        self.mouse_sensivity = if enable { SENSITIVTY } else { 0.0 };
     }
 }
