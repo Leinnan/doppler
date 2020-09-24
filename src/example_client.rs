@@ -12,22 +12,26 @@ pub struct ExampleClient {
     camera: Camera,
     shader: shader::Shader,
     show_object_info: bool,
+    show_camera_info: bool,
 }
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
-        let mut t = Transform::default();
-        t.position = vec3(3.0, -1.75, -1.25);
-        t.scale = vec3(0.2, 0.1, 0.2);
         let model = ModelComponent {
-            transform: t,
-            model: model::Model::new("resources/objects/nanosuit/nanosuit.obj"),
+            transform: Transform::default(),
+            model: model::Model::new("resources/objects/robot/robot.obj"),
         };
         ExampleClient {
-            show_object_info: true,
+            show_camera_info: true,
+            show_object_info: false,
             model: model,
             camera: Camera {
-                position: Point3::new(0.0, 0.0, 3.0),
+                position: Point3::new(0.0, 8.0, 13.0),
+                front: vec3(0.0, -0.4, -1.0),
+                up: vec3(0.0, 1.0, -0.4),
+                right: vec3(1.0, 0.0, 0.0),
+                yaw: -90.0,
+                pitch: -20.0,
                 ..Camera::default()
             },
             shader: shader::Shader::from_file(
@@ -74,6 +78,9 @@ impl Client for ExampleClient {
         }
         self.camera
             .enable_mouse_movement(window.get_key(Key::LeftControl) != Action::Press);
+        if window.get_key(Key::O) == Action::Press {
+            println!("{:?}",self.camera);
+        }
     }
 
     fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui) {
@@ -86,6 +93,12 @@ impl Client for ExampleClient {
                     .build(ui)
                 {
                     self.show_object_info = !self.show_object_info;
+                }
+                if MenuItem::new(im_str!("Show camera info"))
+                    .selected(self.show_camera_info)
+                    .build(ui)
+                {
+                    self.show_camera_info = !self.show_camera_info;
                 }
                 menu.end(ui);
             }
@@ -110,6 +123,22 @@ impl Client for ExampleClient {
                 menu.end(ui);
             }
             menu_bar.end(ui);
+        }
+        if self.show_camera_info {
+            let text = format!("{:?}", self.camera).replace("{","{\n").replace("}","\n}").replace("],","],\n");
+            Window::new(im_str!("CameraInfo"))
+                    .size([300.0,300.0], Condition::Always)
+                    .position(
+                        [50.0, 50.0],
+                        Condition::Always,
+                    ).title_bar(false)
+                    .scroll_bar(false)
+                    .collapsible(false)
+                    .build(&ui, || {
+                        ui.text(im_str!("Camera info"));
+                        ui.separator();
+                        ui.text(text);
+                    });
         }
         if self.show_object_info {
             let mut show_window = self.show_object_info;

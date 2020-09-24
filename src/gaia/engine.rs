@@ -8,7 +8,6 @@ use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
 use imgui_glfw_rs::imgui;
 use imgui_glfw_rs::ImguiGLFW;
-use imgui_inspect::InspectArgsStruct;
 
 pub struct Engine {
     pub camera: Camera,
