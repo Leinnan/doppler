@@ -1,3 +1,5 @@
+#![macro_use]
+
 /// Macro to get c strings from literals without runtime overhead
 /// Literal must not contain any interior nul bytes!
 macro_rules! c_str {

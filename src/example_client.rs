@@ -1,29 +1,30 @@
 
 use crate::gaia::camera::*;
-use crate::gaia::consts;
+use crate::gaia::{consts,macros};
 use crate::gaia::*;
-#[macro_use]
 use imgui_glfw_rs::glfw;
-use crate::gaia::macros;
+use crate::gaia::components::{Transform,ModelComponent};
 use crate::gaia::engine::Engine;
 use crate::gaia::client::Client;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Rad, Vector3};
-macro_rules! c_str {
-    ($literal:expr) => {
-        std::ffi::CStr::from_bytes_with_nul_unchecked(concat!($literal, "\0").as_bytes())
-    };
-}
 
 pub struct ExampleClient {
-    model: model::Model,
+    model: ModelComponent,
     camera: Camera,
     shader: shader::Shader,
 }
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
-        ExampleClient {
+        let mut t = Transform::default();
+        t.position = vec3(3.0, -1.75, -1.25);
+        t.scale = vec3(0.2,0.1,0.2);
+        let model = ModelComponent {
+            transform: t,
             model: model::Model::new("resources/objects/nanosuit/nanosuit.obj"),
+        };
+        ExampleClient {
+            model: model,
             camera: Camera {
                 position: Point3::new(0.0, 0.0, 3.0),
                 ..Camera::default()
@@ -50,11 +51,8 @@ impl Client for ExampleClient {
         let view = self.camera.get_view_matrix();
         self.shader.setMat4(c_str!("projection"), &projection);
         self.shader.setMat4(c_str!("view"), &view);
-
-        let mut m = Matrix4::<f32>::from_translation(vec3(3.0, -1.75, -1.25)); // translate it down so it's at the center of the scene
-        m = m * Matrix4::from_scale(0.2); // it's a bit too big for our scene, so scale it down
-        self.shader.setMat4(c_str!("model"), &m);
-        self.model.Draw(&self.shader);
+        
+        self.model.draw(&self.shader);
     }
     fn update(&mut self, engine: &mut Engine) {
 

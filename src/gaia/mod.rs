@@ -1,9 +1,9 @@
+pub mod macros;
 pub mod camera;
+pub mod components;
 pub mod client;
 pub mod consts;
 pub mod utils;
-#[macro_use]
-pub mod macros;
 pub mod bg_info;
 pub mod engine;
 pub mod mesh;

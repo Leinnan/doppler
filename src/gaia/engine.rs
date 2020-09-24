@@ -65,12 +65,13 @@ impl Engine {
 
             {
                 use imgui::*;
+                let fps  = 1.0 / delta_time;
                 let mut info = self.bg_info;
                 Window::new(im_str!("Hello world"))
                     .size([300.0, 110.0], Condition::FirstUseEver)
                     .build(&ui, || {
                         ui.text(im_str!("Hello world!"));
-                        ui.text(im_str!("こんにちは世界！"));
+                        ui.text(format!("{:.0}", fps));
                         ui.text(im_str!("This...is...imgui-rs!"));
                         ui.separator();
                         ui.text(format!("Mouse position: ({:.1},{:.1})", last_x, last_y));
