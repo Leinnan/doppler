@@ -8,7 +8,7 @@ use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
 use imgui_glfw_rs::glfw;
 
 pub struct ExampleClient {
-    model: ModelComponent,
+    models: Vec<ModelComponent>,
     camera: Camera,
     shader: shader::Shader,
     show_object_info: bool,
@@ -17,14 +17,42 @@ pub struct ExampleClient {
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
-        let model = ModelComponent {
+        let tree = ModelComponent {
+            transform: Transform{ position: vec3(10.0,0.0,26.0),
+                scale: vec3(2.5, 2.5, 2.5),
+                ..Transform::default()},
+            model: model::Model::new_ext("resources/objects/tree/tree_6_d.obj",
+            Some("tree_e.png")),
+        };
+        let tree2 = ModelComponent {
+            transform: Transform{ position: vec3(-9.0,0.0,-15.0),
+                scale: vec3(2.5, 2.5, 2.5),
+                ..Transform::default()},
+            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj",
+            Some("tree_e.png")),
+        };
+        let tree3 = ModelComponent {
+            transform: Transform{ position: vec3(15.0,0.0,-7.0),
+                scale: vec3(2.5, 2.5, 2.5),
+                ..Transform::default()},
+            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj",
+            Some("tree_e.png")),
+        };
+        let ground = ModelComponent {
+            transform: Transform {
+                scale: vec3(0.5, 0.5, 0.5),
+                ..Transform::default()
+            },
+            model: model::Model::new("resources/objects/ground/ground.obj"),
+        };
+        let robot = ModelComponent {
             transform: Transform::default(),
             model: model::Model::new("resources/objects/robot/robot.obj"),
         };
         ExampleClient {
             show_camera_info: true,
             show_object_info: false,
-            model: model,
+            models: vec!(tree,tree2,tree3,ground, robot),
             camera: Camera {
                 position: Point3::new(0.0, 8.0, 13.0),
                 front: vec3(0.0, -0.4, -1.0),
@@ -57,7 +85,9 @@ impl Client for ExampleClient {
         self.shader.set_mat4(c_str!("projection"), &projection);
         self.shader.set_mat4(c_str!("view"), &view);
 
-        self.model.draw(&self.shader);
+        for model in self.models.iter() {
+            model.draw(&self.shader);
+        }
     }
     fn update(&mut self, _engine: &mut Engine) {}
 
@@ -79,7 +109,7 @@ impl Client for ExampleClient {
         self.camera
             .enable_mouse_movement(window.get_key(Key::LeftControl) != Action::Press);
         if window.get_key(Key::O) == Action::Press {
-            println!("{:?}",self.camera);
+            println!("{:?}", self.camera);
         }
     }
 
@@ -125,20 +155,21 @@ impl Client for ExampleClient {
             menu_bar.end(ui);
         }
         if self.show_camera_info {
-            let text = format!("{:?}", self.camera).replace("{","{\n").replace("}","\n}").replace("],","],\n");
+            let text = format!("{:?}", self.camera)
+                .replace("{", "{\n")
+                .replace("}", "\n}")
+                .replace("],", "],\n");
             Window::new(im_str!("CameraInfo"))
-                    .size([300.0,300.0], Condition::Always)
-                    .position(
-                        [50.0, 50.0],
-                        Condition::Always,
-                    ).title_bar(false)
-                    .scroll_bar(false)
-                    .collapsible(false)
-                    .build(&ui, || {
-                        ui.text(im_str!("Camera info"));
-                        ui.separator();
-                        ui.text(text);
-                    });
+                .size([300.0, 300.0], Condition::Always)
+                .position([50.0, 50.0], Condition::Always)
+                .title_bar(false)
+                .scroll_bar(false)
+                .collapsible(false)
+                .build(&ui, || {
+                    ui.text(im_str!("Camera info"));
+                    ui.separator();
+                    ui.text(text);
+                });
         }
         if self.show_object_info {
             let mut show_window = self.show_object_info;
@@ -146,7 +177,7 @@ impl Client for ExampleClient {
                 .size([250.0, 250.0], Condition::FirstUseEver)
                 .opened(&mut show_window)
                 .build(&ui, || {
-                    let mut selected_mut = vec![&mut self.model.transform];
+                    let mut selected_mut = vec![&mut self.models[0].transform];
                     <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
                         &mut selected_mut,
                         "Object info",

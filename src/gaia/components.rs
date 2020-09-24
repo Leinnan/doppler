@@ -1,6 +1,6 @@
 use crate::gaia::model::Model;
 use crate::gaia::shader::Shader;
-use cgmath::{vec3, Matrix4, Vector3, Rad};
+use cgmath::{vec3, Matrix4, Rad, Vector3};
 use imgui_glfw_rs::imgui;
 use imgui_inspect::InspectArgsDefault;
 use imgui_inspect::InspectRenderDefault;
@@ -89,7 +89,7 @@ pub struct ModelComponent {
 }
 
 impl ModelComponent {
-    pub unsafe fn draw(&mut self, shader: &Shader) {
+    pub unsafe fn draw(&self, shader: &Shader) {
         let matrix = self.transform.get_matrix();
 
         shader.set_mat4(c_str!("model"), &matrix);

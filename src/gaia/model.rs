@@ -18,7 +18,7 @@ pub struct Model {
 
 impl Model {
     /// constructor, expects a filepath to a 3D model.
-    pub fn new(path: &str) -> Model {
+    pub fn new_ext(path: &str, diff_texture: Option<&str>) -> Model {
         let pathObj = Path::new(path);
         let mut model = Model {
             meshes: Vec::<Mesh>::new(),
@@ -30,8 +30,12 @@ impl Model {
                 .unwrap()
                 .into(),
         };
-        model.load_model(path);
+        model.load_model(path, diff_texture);
         model
+    }
+
+    pub fn new(path: &str) -> Model {
+        Model::new_ext(path, None)
     }
 
     pub fn Draw(&self, shader: &Shader) {
@@ -43,7 +47,7 @@ impl Model {
     }
 
     // loads a model from file and stores the resulting meshes in the meshes vector.
-    fn load_model(&mut self, path: &str) {
+    fn load_model(&mut self, path: &str, diffuse_path: Option<&str>) {
         let path = Path::new(path);
         println!("Started loading model from path: {}", path.display());
 
@@ -98,7 +102,17 @@ impl Model {
                         self.load_material_texture(&material.normal_texture, "texture_normal");
                     textures.push(texture);
                 }
-                // NOTE: no height maps
+            // NOTE: no height maps
+            } else if diffuse_path.is_some() {
+                println!("Loading {}", &diffuse_path.unwrap());
+                let texture = self.load_material_texture(&diffuse_path.unwrap(), "texture_diffuse");
+                textures.push(texture);
+            } else {
+                println!(
+                    "There are no materials with id {} for: {}",
+                    mesh.material_id.unwrap_or(404usize),
+                    path.display()
+                );
             }
 
             self.meshes.push(Mesh::new(vertices, indices, textures));

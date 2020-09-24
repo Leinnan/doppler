@@ -70,7 +70,10 @@ impl Engine {
                 Window::new(im_str!("EngineInfo"))
                     .size(size, Condition::Always)
                     .position(
-                        [self.window_size.0 - size[0] - offset, self.window_size.1 - size[1] - offset],
+                        [
+                            self.window_size.0 - size[0] - offset,
+                            self.window_size.1 - size[1] - offset,
+                        ],
                         Condition::Always,
                     )
                     .no_decoration()
