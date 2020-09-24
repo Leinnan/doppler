@@ -1,6 +1,6 @@
 use crate::gaia::model::Model;
 use crate::gaia::shader::Shader;
-use cgmath::{vec3, Matrix4, Vector3};
+use cgmath::{vec3, Matrix4, Vector3, Rad};
 use imgui_glfw_rs::imgui;
 use imgui_inspect::InspectArgsDefault;
 use imgui_inspect::InspectRenderDefault;
@@ -75,6 +75,9 @@ impl Transform {
     pub fn get_matrix(&self) -> Matrix4<f32> {
         let mut m = Matrix4::<f32>::from_translation(self.position);
         m = m * Matrix4::from_nonuniform_scale(self.scale.x, self.scale.y, self.scale.z);
+        m = m * Matrix4::<f32>::from_angle_x(Rad(self.rotation.x.to_radians()));
+        m = m * Matrix4::<f32>::from_angle_y(Rad(self.rotation.y.to_radians()));
+        m = m * Matrix4::<f32>::from_angle_z(Rad(self.rotation.z.to_radians()));
 
         m
     }
