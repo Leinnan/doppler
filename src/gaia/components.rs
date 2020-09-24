@@ -25,21 +25,24 @@ impl InspectRenderDefault<Vector3<f32>> for CgmathVec3f32 {
         _args: &InspectArgsDefault,
     ) -> bool {
         use imgui::*;
+        let id_x = im_str!("x##{}", label);
+        let id_y = im_str!("y##{}", label);
+        let id_z = im_str!("z##{}", label);
         ui.text(label);
         let mut change = false;
         for el in data.iter_mut() {
             change |= ui
-                .input_float(im_str!("x"), &mut el.x)
+                .input_float(&id_x, &mut el.x)
                 .step(0.01)
                 .step_fast(1.0)
                 .build();
             change |= ui
-                .input_float(im_str!("y"), &mut el.y)
+                .input_float(&id_y, &mut el.y)
                 .step(0.01)
                 .step_fast(1.0)
                 .build();
             change |= ui
-                .input_float(im_str!("z"), &mut el.z)
+                .input_float(&id_z, &mut el.z)
                 .step(0.01)
                 .step_fast(1.0)
                 .build();
@@ -48,12 +51,12 @@ impl InspectRenderDefault<Vector3<f32>> for CgmathVec3f32 {
     }
 }
 
-#[derive(Inspect, Clone)]
+#[derive(Inspect, Clone, Copy, Debug)]
 pub struct Transform {
     #[inspect(proxy_type = "CgmathVec3f32")]
-    pub position: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
     pub scale: Vector3<f32>,
+    #[inspect(proxy_type = "CgmathVec3f32")]
+    pub position: Vector3<f32>,
     #[inspect(proxy_type = "CgmathVec3f32")]
     pub rotation: Vector3<f32>,
 }
