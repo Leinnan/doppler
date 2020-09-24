@@ -20,6 +20,7 @@ pub struct Engine {
     pub imgui: imgui::Context,
     pub imgui_glfw: ImguiGLFW,
     pub client: Box<dyn Client>,
+    enable_debug_layer: bool,
 }
 
 impl Engine {
@@ -60,40 +61,31 @@ impl Engine {
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             // -------------------------------------------------------------------------------
 
-            let ui = self.imgui_glfw.frame(&mut self.window, &mut self.imgui);
-
-            {
+            if self.enable_debug_layer {
+                let ui = self.imgui_glfw.frame(&mut self.window, &mut self.imgui);
                 self.client.debug_draw(&ui);
                 use imgui::*;
                 let fps = 1.0 / delta_time;
-                let mut info = self.bg_info;
-                Window::new(im_str!("Hello world"))
-                    .size([300.0, 110.0], Condition::FirstUseEver)
+                let size = [280.0, 110.0];
+                let offset = 20.0;
+                Window::new(im_str!("EngineInfo"))
+                    .size(size, Condition::Always)
+                    .position(
+                        [self.window_size.0 - size[0] - offset, self.window_size.1 - size[1] - offset],
+                        Condition::Always,
+                    )
+                    .no_decoration()
+                    .no_inputs()
+                    .save_settings(false)
                     .build(&ui, || {
-                        ui.text(im_str!("Hello world!"));
-                        ui.text(format!("{:.0}", fps));
-                        ui.text(im_str!("This...is...imgui-rs!"));
+                        ui.text(im_str!("Hello Rust!"));
+                        ui.text(format!("FPS: {:.0}", fps));
                         ui.separator();
-                        ui.text(format!("Mouse position: ({:.1},{:.1})", last_x, last_y));
-                        let selected = vec![&info];
-                        <BgInfo as imgui_inspect::InspectRenderStruct<BgInfo>>::render(
-                            &selected,
-                            "Example Struct - Read Only",
-                            &ui,
-                            &InspectArgsStruct::default(),
-                        );
-                        let mut selected_mut = vec![&mut info];
-                        <BgInfo as imgui_inspect::InspectRenderStruct<BgInfo>>::render_mut(
-                            &mut selected_mut,
-                            "Example Struct - Writable",
-                            &ui,
-                            &InspectArgsStruct::default(),
-                        );
+                        ui.text(format!("Mouse position: ({:4.1},{:4.1})", last_x, last_y));
                     });
-                self.bg_info = info;
+                self.imgui_glfw.draw(ui, &mut self.window);
             }
 
-            self.imgui_glfw.draw(ui, &mut self.window);
             self.window.swap_buffers();
             self.glfw.poll_events();
             // events
@@ -105,6 +97,11 @@ impl Engine {
     pub fn process_input(&mut self, delta_time: f32) {
         if self.window.get_key(Key::Escape) == Action::Press {
             self.window.set_should_close(true)
+        }
+        if self.window.get_key(Key::P) == Action::Press
+            && self.window.get_key(Key::LeftShift) == Action::Press
+        {
+            self.enable_debug_layer = !self.enable_debug_layer;
         }
         self.client.process_input(&self.window, delta_time);
     }
@@ -275,6 +272,7 @@ impl Default for Engine {
                 position: Point3::new(0.0, 0.0, 3.0),
                 ..Camera::default()
             },
+            enable_debug_layer: true,
             client: Box::new(ExampleClient::create()),
         }
     }

@@ -11,6 +11,7 @@ pub struct ExampleClient {
     model: ModelComponent,
     camera: Camera,
     shader: shader::Shader,
+    show_object_info: bool,
 }
 
 impl ExampleClient {
@@ -23,6 +24,7 @@ impl ExampleClient {
             model: model::Model::new("resources/objects/nanosuit/nanosuit.obj"),
         };
         ExampleClient {
+            show_object_info: true,
             model: model,
             camera: Camera {
                 position: Point3::new(0.0, 0.0, 3.0),
@@ -77,17 +79,54 @@ impl Client for ExampleClient {
     fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui) {
         use imgui_glfw_rs::imgui::*;
         use imgui_inspect::InspectArgsStruct;
-        Window::new(im_str!("Object info"))
-            .size([250.0, 250.0], Condition::FirstUseEver)
-            .build(&ui, || {
-                let mut selected_mut = vec![&mut self.model.transform];
-                <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
-                    &mut selected_mut,
-                    "Example Struct - Writable",
-                    &ui,
-                    &InspectArgsStruct::default(),
-                );
-            });
+        if let Some(menu_bar) = ui.begin_main_menu_bar() {
+            if let Some(menu) = ui.begin_menu(im_str!("Basic"), true) {
+                if MenuItem::new(im_str!("Show Object info"))
+                    .selected(self.show_object_info)
+                    .build(ui)
+                {
+                    self.show_object_info = !self.show_object_info;
+                }
+                menu.end(ui);
+            }
+            if let Some(menu) = ui.begin_menu(im_str!("Edit"), true) {
+                MenuItem::new(im_str!("Undo"))
+                    .shortcut(im_str!("CTRL+Z"))
+                    .build(ui);
+                MenuItem::new(im_str!("Redo"))
+                    .shortcut(im_str!("CTRL+Y"))
+                    .enabled(false)
+                    .build(ui);
+                ui.separator();
+                MenuItem::new(im_str!("Cut"))
+                    .shortcut(im_str!("CTRL+X"))
+                    .build(ui);
+                MenuItem::new(im_str!("Copy"))
+                    .shortcut(im_str!("CTRL+C"))
+                    .build(ui);
+                MenuItem::new(im_str!("Paste"))
+                    .shortcut(im_str!("CTRL+V"))
+                    .build(ui);
+                menu.end(ui);
+            }
+            menu_bar.end(ui);
+        }
+        if self.show_object_info {
+            let mut show_window = self.show_object_info;
+            Window::new(im_str!("Object info"))
+                .size([250.0, 250.0], Condition::FirstUseEver)
+                .opened(&mut show_window)
+                .build(&ui, || {
+                    let mut selected_mut = vec![&mut self.model.transform];
+                    <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
+                        &mut selected_mut,
+                        "Object info",
+                        &ui,
+                        &InspectArgsStruct::default(),
+                    );
+                });
+            self.show_object_info = show_window;
+        }
     }
 
     fn on_mouse_scroll(&mut self, yoffset: f32) {
