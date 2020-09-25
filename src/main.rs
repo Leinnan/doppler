@@ -1,7 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 extern crate gl;
-extern crate image;
 extern crate imgui_glfw_rs;
 use human_panic::setup_panic;
 #[macro_use]
