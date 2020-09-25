@@ -1,36 +1,33 @@
 use gl;
-use image2::{
-    ImagePtr,
-    Rgb,Rgba,
-    io,
- };
+use image2::{io, ImagePtr, Rgb, Rgba};
 use std::os::raw::c_void;
-use std::path::Path;
 
-
-pub unsafe fn load_texture(path: &str, file_format: &str)  -> u32 {
-    println!("[stb]Loading texture from path: {} with format {}", path, file_format);
+pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
+    println!(
+        "[stb]Loading texture from path: {} with format {}",
+        path, file_format
+    );
     let mut id = 0;
     use image2::image::Image;
 
     gl::GenTextures(1, &mut id);
     let (data, dim, format) = match file_format {
         "png" => {
-            let img : ImagePtr<u8, Rgba> = io::read_u8(path).unwrap();
+            let img: ImagePtr<u8, Rgba> = io::read_u8(path).unwrap();
 
             let img_data = img.data().to_vec();
-            let (x,y,_) = img.shape();
+            let (x, y, _) = img.shape();
 
-            (img_data,(x as i32,y as i32),gl::RGBA)
-        },
+            (img_data, (x as i32, y as i32), gl::RGBA)
+        }
         _ => {
-            let img : ImagePtr<u8, Rgb> = io::read_u8(path).unwrap();
+            let img: ImagePtr<u8, Rgb> = io::read_u8(path).unwrap();
 
             let img_data = img.data().to_vec();
-            let (x,y,_) = img.shape();
+            let (x, y, _) = img.shape();
 
-            (img_data,(x as i32,y as i32),gl::RGB)
-        },
+            (img_data, (x as i32, y as i32), gl::RGB)
+        }
     };
 
     gl::BindTexture(gl::TEXTURE_2D, id);
@@ -64,5 +61,5 @@ pub unsafe fn load_texture_from_dir(filename: &str, directory: &str) -> u32 {
     let dot = filename.find(".").unwrap_or_default() + 1usize;
     let (_, format) = filename.split_at(dot);
 
-    load_texture(&fullpath,format)
+    load_texture(&fullpath, format)
 }

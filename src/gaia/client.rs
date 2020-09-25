@@ -1,6 +1,6 @@
+use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::engine::Engine;
 use imgui_glfw_rs::glfw;
-use crate::gaia::assets_cache::AssetsCache;
 
 pub trait Client {
     fn load_assets(&mut self, cache: &mut AssetsCache);

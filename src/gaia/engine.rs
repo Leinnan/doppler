@@ -1,9 +1,9 @@
 use crate::example_client::ExampleClient;
+use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::bg_info::BgInfo;
 use crate::gaia::camera::*;
 use crate::gaia::client::Client;
 use crate::gaia::consts;
-use crate::gaia::assets_cache::AssetsCache;
 use cgmath::Point3;
 use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};

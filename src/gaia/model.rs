@@ -1,10 +1,10 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 
+use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::mesh::{Mesh, Texture, Vertex};
 use crate::gaia::shader::Shader;
 use crate::gaia::utils::*;
-use crate::gaia::assets_cache::AssetsCache;
 use cgmath::{vec2, vec3};
 use std::path::Path;
 use tobj;
@@ -87,25 +87,39 @@ impl Model {
 
                 // 1. diffuse map
                 if !material.diffuse_texture.is_empty() {
-                    let texture = cache.load_material_texture(&self.directory, &material.diffuse_texture, "texture_diffuse");
+                    let texture = cache.load_material_texture(
+                        &self.directory,
+                        &material.diffuse_texture,
+                        "texture_diffuse",
+                    );
                     textures.push(texture);
                 }
                 // 2. specular map
                 if !material.specular_texture.is_empty() {
-                    let texture =
-                    cache.load_material_texture(&self.directory, &material.specular_texture, "texture_specular");
+                    let texture = cache.load_material_texture(
+                        &self.directory,
+                        &material.specular_texture,
+                        "texture_specular",
+                    );
                     textures.push(texture);
                 }
                 // 3. normal map
                 if !material.normal_texture.is_empty() {
-                    let texture =
-                    cache.load_material_texture(&self.directory, &material.normal_texture, "texture_normal");
+                    let texture = cache.load_material_texture(
+                        &self.directory,
+                        &material.normal_texture,
+                        "texture_normal",
+                    );
                     textures.push(texture);
                 }
             // NOTE: no height maps
             } else if diffuse_path.is_some() {
                 println!("Loading {}", &diffuse_path.unwrap());
-                let texture = cache.load_material_texture(&self.directory, &diffuse_path.unwrap(), "texture_diffuse");
+                let texture = cache.load_material_texture(
+                    &self.directory,
+                    &diffuse_path.unwrap(),
+                    "texture_diffuse",
+                );
                 textures.push(texture);
             } else {
                 println!("There are no materials for: {}", path.display());

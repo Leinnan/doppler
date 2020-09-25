@@ -1,3 +1,4 @@
+use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::camera::*;
 use crate::gaia::client::Client;
 use crate::gaia::components::{ModelComponent, Transform};
@@ -6,8 +7,6 @@ use crate::gaia::engine::Engine;
 use crate::gaia::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
 use imgui_glfw_rs::glfw;
-use crate::gaia::assets_cache::AssetsCache;
-
 
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
@@ -49,11 +48,11 @@ impl Client for ExampleClient {
                 scale: vec3(0.5, 0.5, 0.5),
                 ..Transform::default()
             },
-            model: model::Model::new("resources/objects/ground/ground.obj",cache),
+            model: model::Model::new("resources/objects/ground/ground.obj", cache),
         };
         let robot = ModelComponent {
             transform: Transform::default(),
-            model: model::Model::new("resources/objects/robot/robot.obj",cache),
+            model: model::Model::new("resources/objects/robot/robot.obj", cache),
         };
         let tree = ModelComponent {
             transform: Transform {
@@ -61,7 +60,11 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: model::Model::new_ext("resources/objects/tree/tree_6_d.obj", Some("tree_e.png"),cache),
+            model: model::Model::new_ext(
+                "resources/objects/tree/tree_6_d.obj",
+                Some("tree_e.png"),
+                cache,
+            ),
         };
         let tree2 = ModelComponent {
             transform: Transform {
@@ -69,7 +72,11 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png"),cache),
+            model: model::Model::new_ext(
+                "resources/objects/tree/tree_6_c.obj",
+                Some("tree_e.png"),
+                cache,
+            ),
         };
         let tree3 = ModelComponent {
             transform: Transform {
@@ -77,7 +84,11 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png"),cache),
+            model: model::Model::new_ext(
+                "resources/objects/tree/tree_6_c.obj",
+                Some("tree_e.png"),
+                cache,
+            ),
         };
         self.models = vec![tree, tree2, tree3, ground, robot];
     }
