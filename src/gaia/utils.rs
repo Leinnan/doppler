@@ -1,6 +1,7 @@
 use gl;
 use image2::{io, ImagePtr, Rgb, Rgba};
 use std::os::raw::c_void;
+use image2::image::Image;
 
 pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
     println!(
@@ -8,7 +9,6 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
         path, file_format
     );
     let mut id = 0;
-    use image2::image::Image;
 
     gl::GenTextures(1, &mut id);
     let (data, dim, format) = match file_format {
