@@ -1,7 +1,9 @@
 use crate::gaia::engine::Engine;
 use imgui_glfw_rs::glfw;
+use crate::gaia::assets_cache::AssetsCache;
 
 pub trait Client {
+    fn load_assets(&mut self, cache: &mut AssetsCache);
     fn update(&mut self, engine: &mut Engine);
     fn process_input(&mut self, window: &glfw::Window, delta: f32);
     fn on_mouse_scroll(&mut self, yoffset: f32);

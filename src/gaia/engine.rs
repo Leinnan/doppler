@@ -3,6 +3,7 @@ use crate::gaia::bg_info::BgInfo;
 use crate::gaia::camera::*;
 use crate::gaia::client::Client;
 use crate::gaia::consts;
+use crate::gaia::assets_cache::AssetsCache;
 use cgmath::Point3;
 use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
@@ -20,10 +21,12 @@ pub struct Engine {
     pub imgui_glfw: ImguiGLFW,
     pub client: Box<dyn Client>,
     enable_debug_layer: bool,
+    assets_cache: AssetsCache,
 }
 
 impl Engine {
     pub fn run(&mut self) {
+        self.client.load_assets(&mut self.assets_cache);
         let mut first_mouse = true;
         let mut last_x: f32 = consts::SCR_WIDTH as f32 / 2.0;
         let mut last_y: f32 = consts::SCR_HEIGHT as f32 / 2.0;
@@ -276,6 +279,7 @@ impl Default for Engine {
             },
             enable_debug_layer: true,
             client: Box::new(ExampleClient::create()),
+            assets_cache: AssetsCache::default(),
         }
     }
 }

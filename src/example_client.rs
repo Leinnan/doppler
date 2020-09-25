@@ -6,6 +6,8 @@ use crate::gaia::engine::Engine;
 use crate::gaia::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
 use imgui_glfw_rs::glfw;
+use crate::gaia::assets_cache::AssetsCache;
+
 
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
@@ -18,46 +20,11 @@ pub struct ExampleClient {
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
-        let tree = ModelComponent {
-            transform: Transform {
-                position: vec3(10.0, 0.0, 26.0),
-                scale: vec3(2.5, 2.5, 2.5),
-                ..Transform::default()
-            },
-            model: model::Model::new_ext("resources/objects/tree/tree_6_d.obj", Some("tree_e.png")),
-        };
-        let tree2 = ModelComponent {
-            transform: Transform {
-                position: vec3(-9.0, 0.0, -15.0),
-                scale: vec3(2.5, 2.5, 2.5),
-                ..Transform::default()
-            },
-            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
-        };
-        let tree3 = ModelComponent {
-            transform: Transform {
-                position: vec3(15.0, 0.0, -7.0),
-                scale: vec3(2.5, 2.5, 2.5),
-                ..Transform::default()
-            },
-            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
-        };
-        let ground = ModelComponent {
-            transform: Transform {
-                scale: vec3(0.5, 0.5, 0.5),
-                ..Transform::default()
-            },
-            model: model::Model::new("resources/objects/ground/ground.obj"),
-        };
-        let robot = ModelComponent {
-            transform: Transform::default(),
-            model: model::Model::new("resources/objects/robot/robot.obj"),
-        };
         ExampleClient {
             object_info_id: 0,
             show_camera_info: true,
             show_object_info: false,
-            models: vec![tree, tree2, tree3, ground, robot],
+            models: vec![],
             camera: Camera {
                 position: Point3::new(0.0, 8.0, 13.0),
                 front: vec3(0.0, -0.4, -1.0),
@@ -76,6 +43,45 @@ impl ExampleClient {
 }
 
 impl Client for ExampleClient {
+    fn load_assets(&mut self, cache: &mut AssetsCache) {
+        let ground = ModelComponent {
+            transform: Transform {
+                scale: vec3(0.5, 0.5, 0.5),
+                ..Transform::default()
+            },
+            model: model::Model::new("resources/objects/ground/ground.obj",cache),
+        };
+        let robot = ModelComponent {
+            transform: Transform::default(),
+            model: model::Model::new("resources/objects/robot/robot.obj",cache),
+        };
+        let tree = ModelComponent {
+            transform: Transform {
+                position: vec3(10.0, 0.0, 26.0),
+                scale: vec3(2.5, 2.5, 2.5),
+                ..Transform::default()
+            },
+            model: model::Model::new_ext("resources/objects/tree/tree_6_d.obj", Some("tree_e.png"),cache),
+        };
+        let tree2 = ModelComponent {
+            transform: Transform {
+                position: vec3(-9.0, 0.0, -15.0),
+                scale: vec3(2.5, 2.5, 2.5),
+                ..Transform::default()
+            },
+            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png"),cache),
+        };
+        let tree3 = ModelComponent {
+            transform: Transform {
+                position: vec3(15.0, 0.0, -7.0),
+                scale: vec3(2.5, 2.5, 2.5),
+                ..Transform::default()
+            },
+            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png"),cache),
+        };
+        self.models = vec![tree, tree2, tree3, ground, robot];
+    }
+
     unsafe fn draw(&mut self) {
         self.shader.use_program();
 

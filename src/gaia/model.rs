@@ -4,6 +4,7 @@
 use crate::gaia::mesh::{Mesh, Texture, Vertex};
 use crate::gaia::shader::Shader;
 use crate::gaia::utils::*;
+use crate::gaia::assets_cache::AssetsCache;
 use cgmath::{vec2, vec3};
 use std::path::Path;
 use tobj;
@@ -18,7 +19,7 @@ pub struct Model {
 
 impl Model {
     /// constructor, expects a filepath to a 3D model.
-    pub fn new_ext(path: &str, diff_texture: Option<&str>) -> Model {
+    pub fn new_ext(path: &str, diff_texture: Option<&str>, cache: &mut AssetsCache) -> Model {
         let pathObj = Path::new(path);
         let mut model = Model {
             meshes: Vec::<Mesh>::new(),
@@ -30,12 +31,12 @@ impl Model {
                 .unwrap()
                 .into(),
         };
-        model.load_model(path, diff_texture);
+        model.load_model(path, diff_texture, cache);
         model
     }
 
-    pub fn new(path: &str) -> Model {
-        Model::new_ext(path, None)
+    pub fn new(path: &str, cache: &mut AssetsCache) -> Model {
+        Model::new_ext(path, None, cache)
     }
 
     pub fn Draw(&self, shader: &Shader) {
@@ -47,7 +48,7 @@ impl Model {
     }
 
     // loads a model from file and stores the resulting meshes in the meshes vector.
-    fn load_model(&mut self, path: &str, diffuse_path: Option<&str>) {
+    fn load_model(&mut self, path: &str, diffuse_path: Option<&str>, cache: &mut AssetsCache) {
         let path = Path::new(path);
         println!("Started loading model from path: {}", path.display());
 
@@ -86,26 +87,25 @@ impl Model {
 
                 // 1. diffuse map
                 if !material.diffuse_texture.is_empty() {
-                    let texture =
-                        self.load_material_texture(&material.diffuse_texture, "texture_diffuse");
+                    let texture = cache.load_material_texture(&self.directory, &material.diffuse_texture, "texture_diffuse");
                     textures.push(texture);
                 }
                 // 2. specular map
                 if !material.specular_texture.is_empty() {
                     let texture =
-                        self.load_material_texture(&material.specular_texture, "texture_specular");
+                    cache.load_material_texture(&self.directory, &material.specular_texture, "texture_specular");
                     textures.push(texture);
                 }
                 // 3. normal map
                 if !material.normal_texture.is_empty() {
                     let texture =
-                        self.load_material_texture(&material.normal_texture, "texture_normal");
+                    cache.load_material_texture(&self.directory, &material.normal_texture, "texture_normal");
                     textures.push(texture);
                 }
             // NOTE: no height maps
             } else if diffuse_path.is_some() {
                 println!("Loading {}", &diffuse_path.unwrap());
-                let texture = self.load_material_texture(&diffuse_path.unwrap(), "texture_diffuse");
+                let texture = cache.load_material_texture(&self.directory, &diffuse_path.unwrap(), "texture_diffuse");
                 textures.push(texture);
             } else {
                 println!("There are no materials for: {}", path.display());
@@ -114,22 +114,5 @@ impl Model {
             self.meshes.push(Mesh::new(vertices, indices, textures));
         }
         println!("Finished loading model from path: {}", path.display());
-    }
-
-    fn load_material_texture(&mut self, path: &str, typeName: &str) -> Texture {
-        {
-            let texture = self.textures_loaded.iter().find(|t| t.path == path);
-            if let Some(texture) = texture {
-                return texture.clone();
-            }
-        }
-
-        let texture = Texture {
-            id: unsafe { load_texture_from_dir(path, &self.directory) },
-            type_: typeName.into(),
-            path: path.into(),
-        };
-        self.textures_loaded.push(texture.clone());
-        texture
     }
 }
