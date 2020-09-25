@@ -1,7 +1,7 @@
 use gl;
+use image2::image::Image;
 use image2::{io, ImagePtr, Rgb, Rgba};
 use std::os::raw::c_void;
-use image2::image::Image;
 
 pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
     println!(
@@ -30,7 +30,10 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
 
     gl::BindTexture(gl::TEXTURE_2D, id);
     gl::TexImage2D(
-        gl::TEXTURE_2D, 0, format as i32, dim.0 as i32,
+        gl::TEXTURE_2D,
+        0,
+        format as i32,
+        dim.0 as i32,
         dim.1 as i32,
         0,
         format,

@@ -48,11 +48,11 @@ impl Client for ExampleClient {
                 scale: vec3(0.5, 0.5, 0.5),
                 ..Transform::default()
             },
-            model: model::Model::new("resources/objects/ground/ground.obj", cache),
+            model: cache.get_model("resources/objects/ground/ground.obj"),
         };
         let robot = ModelComponent {
             transform: Transform::default(),
-            model: model::Model::new("resources/objects/robot/robot.obj", cache),
+            model: cache.get_model("resources/objects/robot/robot.obj"),
         };
         let tree = ModelComponent {
             transform: Transform {
@@ -60,10 +60,9 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: model::Model::new_ext(
+            model: cache.get_model_ext(
                 "resources/objects/tree/tree_6_d.obj",
-                Some("tree_e.png"),
-                cache,
+                Some("tree_e.png")
             ),
         };
         let tree2 = ModelComponent {
@@ -72,10 +71,9 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: model::Model::new_ext(
+            model: cache.get_model_ext(
                 "resources/objects/tree/tree_6_c.obj",
-                Some("tree_e.png"),
-                cache,
+                Some("tree_e.png")
             ),
         };
         let tree3 = ModelComponent {
@@ -84,10 +82,9 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: model::Model::new_ext(
+            model: cache.get_model_ext(
                 "resources/objects/tree/tree_6_c.obj",
-                Some("tree_e.png"),
-                cache,
+                Some("tree_e.png")
             ),
         };
         self.models = vec![tree, tree2, tree3, ground, robot];

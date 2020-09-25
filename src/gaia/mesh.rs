@@ -16,6 +16,7 @@ use crate::gaia::shader::Shader;
 // Depending on how you pass the data to OpenGL, this may be bad. In this case it's not strictly
 // necessary though because of the `offset!` macro used below in setupMesh()
 #[repr(C)]
+#[derive(Clone)]
 pub struct Vertex {
     // position
     pub position: Vector3<f32>,
@@ -48,6 +49,7 @@ pub struct Texture {
     pub path: String,
 }
 
+#[derive(Clone)]
 pub struct Mesh {
     /*  Mesh Data  */
     pub vertices: Vec<Vertex>,

@@ -9,7 +9,7 @@ use cgmath::{vec2, vec3};
 use std::path::Path;
 use tobj;
 
-// #[derive(Default)]
+#[derive(Clone)]
 pub struct Model {
     /*  Model Data */
     pub meshes: Vec<Mesh>,
@@ -87,7 +87,7 @@ impl Model {
 
                 // 1. diffuse map
                 if !material.diffuse_texture.is_empty() {
-                    let texture = cache.load_material_texture(
+                    let texture = cache.get_material_texture(
                         &self.directory,
                         &material.diffuse_texture,
                         "texture_diffuse",
@@ -96,7 +96,7 @@ impl Model {
                 }
                 // 2. specular map
                 if !material.specular_texture.is_empty() {
-                    let texture = cache.load_material_texture(
+                    let texture = cache.get_material_texture(
                         &self.directory,
                         &material.specular_texture,
                         "texture_specular",
@@ -105,7 +105,7 @@ impl Model {
                 }
                 // 3. normal map
                 if !material.normal_texture.is_empty() {
-                    let texture = cache.load_material_texture(
+                    let texture = cache.get_material_texture(
                         &self.directory,
                         &material.normal_texture,
                         "texture_normal",
@@ -115,7 +115,7 @@ impl Model {
             // NOTE: no height maps
             } else if diffuse_path.is_some() {
                 println!("Loading {}", &diffuse_path.unwrap());
-                let texture = cache.load_material_texture(
+                let texture = cache.get_material_texture(
                     &self.directory,
                     &diffuse_path.unwrap(),
                     "texture_diffuse",
