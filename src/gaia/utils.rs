@@ -14,7 +14,6 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
     let (data, dim, format) = match file_format {
         "png" => {
             let img: ImagePtr<u8, Rgba> = io::read_u8(path).unwrap();
-
             let img_data = img.data().to_vec();
             let (x, y, _) = img.shape();
 
@@ -22,7 +21,6 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
         }
         _ => {
             let img: ImagePtr<u8, Rgb> = io::read_u8(path).unwrap();
-
             let img_data = img.data().to_vec();
             let (x, y, _) = img.shape();
 
@@ -32,10 +30,7 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
 
     gl::BindTexture(gl::TEXTURE_2D, id);
     gl::TexImage2D(
-        gl::TEXTURE_2D,
-        0,
-        format as i32,
-        dim.0 as i32,
+        gl::TEXTURE_2D, 0, format as i32, dim.0 as i32,
         dim.1 as i32,
         0,
         format,
