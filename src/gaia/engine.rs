@@ -65,7 +65,7 @@ impl Engine {
                 self.client.debug_draw(&ui);
                 use imgui::*;
                 let fps = 1.0 / delta_time;
-                let size = [280.0, 110.0];
+                let size = [250.0, 110.0];
                 let offset = 20.0;
                 Window::new(im_str!("EngineInfo"))
                     .size(size, Condition::Always)
@@ -80,7 +80,7 @@ impl Engine {
                     .no_inputs()
                     .save_settings(false)
                     .build(&ui, || {
-                        ui.text(im_str!("Hello Rust!"));
+                        ui.text("Welcome in doppler world!");
                         ui.text(format!("FPS: {:.0}", fps));
                         ui.separator();
                         ui.text(format!("Mouse position: ({:4.1},{:4.1})", last_x, last_y));

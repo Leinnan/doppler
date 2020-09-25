@@ -13,30 +13,34 @@ pub struct ExampleClient {
     shader: shader::Shader,
     show_object_info: bool,
     show_camera_info: bool,
+    object_info_id: i32,
 }
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
         let tree = ModelComponent {
-            transform: Transform{ position: vec3(10.0,0.0,26.0),
+            transform: Transform {
+                position: vec3(10.0, 0.0, 26.0),
                 scale: vec3(2.5, 2.5, 2.5),
-                ..Transform::default()},
-            model: model::Model::new_ext("resources/objects/tree/tree_6_d.obj",
-            Some("tree_e.png")),
+                ..Transform::default()
+            },
+            model: model::Model::new_ext("resources/objects/tree/tree_6_d.obj", Some("tree_e.png")),
         };
         let tree2 = ModelComponent {
-            transform: Transform{ position: vec3(-9.0,0.0,-15.0),
+            transform: Transform {
+                position: vec3(-9.0, 0.0, -15.0),
                 scale: vec3(2.5, 2.5, 2.5),
-                ..Transform::default()},
-            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj",
-            Some("tree_e.png")),
+                ..Transform::default()
+            },
+            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
         };
         let tree3 = ModelComponent {
-            transform: Transform{ position: vec3(15.0,0.0,-7.0),
+            transform: Transform {
+                position: vec3(15.0, 0.0, -7.0),
                 scale: vec3(2.5, 2.5, 2.5),
-                ..Transform::default()},
-            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj",
-            Some("tree_e.png")),
+                ..Transform::default()
+            },
+            model: model::Model::new_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
         };
         let ground = ModelComponent {
             transform: Transform {
@@ -50,9 +54,10 @@ impl ExampleClient {
             model: model::Model::new("resources/objects/robot/robot.obj"),
         };
         ExampleClient {
+            object_info_id: 0,
             show_camera_info: true,
             show_object_info: false,
-            models: vec!(tree,tree2,tree3,ground, robot),
+            models: vec![tree, tree2, tree3, ground, robot],
             camera: Camera {
                 position: Point3::new(0.0, 8.0, 13.0),
                 front: vec3(0.0, -0.4, -1.0),
@@ -79,7 +84,7 @@ impl Client for ExampleClient {
             Deg(self.camera.zoom),
             consts::SCR_WIDTH as f32 / consts::SCR_HEIGHT as f32,
             0.1,
-            100.0,
+            1000.0,
         );
         let view = self.camera.get_view_matrix();
         self.shader.set_mat4(c_str!("projection"), &projection);
@@ -132,26 +137,6 @@ impl Client for ExampleClient {
                 }
                 menu.end(ui);
             }
-            if let Some(menu) = ui.begin_menu(im_str!("Edit"), true) {
-                MenuItem::new(im_str!("Undo"))
-                    .shortcut(im_str!("CTRL+Z"))
-                    .build(ui);
-                MenuItem::new(im_str!("Redo"))
-                    .shortcut(im_str!("CTRL+Y"))
-                    .enabled(false)
-                    .build(ui);
-                ui.separator();
-                MenuItem::new(im_str!("Cut"))
-                    .shortcut(im_str!("CTRL+X"))
-                    .build(ui);
-                MenuItem::new(im_str!("Copy"))
-                    .shortcut(im_str!("CTRL+C"))
-                    .build(ui);
-                MenuItem::new(im_str!("Paste"))
-                    .shortcut(im_str!("CTRL+V"))
-                    .build(ui);
-                menu.end(ui);
-            }
             menu_bar.end(ui);
         }
         if self.show_camera_info {
@@ -172,12 +157,17 @@ impl Client for ExampleClient {
                 });
         }
         if self.show_object_info {
+            let mut id = self.object_info_id;
+            let max: i32 = self.models.len() as i32 - 1;
+            println!("max: {}", max);
             let mut show_window = self.show_object_info;
             Window::new(im_str!("Object info"))
                 .size([250.0, 250.0], Condition::FirstUseEver)
                 .opened(&mut show_window)
                 .build(&ui, || {
-                    let mut selected_mut = vec![&mut self.models[0].transform];
+                    ui.drag_int(im_str!("id"), &mut id).min(0).max(max).build();
+                    // id = if id < 0 { 0 } else if id > max { max } else { id };
+                    let mut selected_mut = vec![&mut self.models[id as usize].transform];
                     <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
                         &mut selected_mut,
                         "Object info",
@@ -185,6 +175,7 @@ impl Client for ExampleClient {
                         &InspectArgsStruct::default(),
                     );
                 });
+            self.object_info_id = id;
             self.show_object_info = show_window;
         }
     }

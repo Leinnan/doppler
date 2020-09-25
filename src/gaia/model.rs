@@ -108,11 +108,7 @@ impl Model {
                 let texture = self.load_material_texture(&diffuse_path.unwrap(), "texture_diffuse");
                 textures.push(texture);
             } else {
-                println!(
-                    "There are no materials with id {} for: {}",
-                    mesh.material_id.unwrap_or(404usize),
-                    path.display()
-                );
+                println!("There are no materials for: {}", path.display());
             }
 
             self.meshes.push(Mesh::new(vertices, indices, textures));
