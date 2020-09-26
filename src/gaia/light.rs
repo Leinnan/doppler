@@ -79,9 +79,62 @@ impl Default for PointLight {
     }
 }
 
+#[derive(Inspect, Clone, Copy, Debug)]
+pub struct DirectionalLight {
+    #[inspect(proxy_type = "CgmathVec3f32")]
+    pub direction: Vector3<f32>,
+    #[inspect(proxy_type = "CgmathVec3f32")]
+    pub ambient: Vector3<f32>,
+    #[inspect(proxy_type = "CgmathVec3f32")]
+    pub diffuse: Vector3<f32>,
+    #[inspect(proxy_type = "CgmathVec3f32")]
+    pub specular: Vector3<f32>,
+}
+
+impl Default for DirectionalLight {
+    fn default() -> Self {
+        DirectionalLight {
+            direction: vec3(-0.3, -1.0, -0.3),
+            ambient: vec3(0.14, 0.14, 0.14),
+            diffuse: vec3(0.4, 0.4, 0.4),
+            specular: vec3(0.5, 0.5, 0.5),
+        }
+    }
+}
+
+impl DirectionalLight {
+    pub unsafe fn shader_update(&self, shader: &Shader) {
+        shader.set_vec3(
+            c_str!("dirLight.direction"),
+            self.direction.x,
+            self.direction.y,
+            self.direction.z,
+        );
+        shader.set_vec3(
+            c_str!("dirLight.ambient"),
+            self.ambient.x,
+            self.ambient.y,
+            self.ambient.z,
+        );
+        shader.set_vec3(
+            c_str!("dirLight.diffuse"),
+            self.diffuse.x,
+            self.diffuse.y,
+            self.diffuse.z,
+        );
+        shader.set_vec3(
+            c_str!("dirLight.specular"),
+            self.specular.x,
+            self.specular.y,
+            self.specular.z,
+        );
+    }
+}
+
 pub struct LightingSystem {
     pub shader: Shader,
     pub point_lights: [PointLight; 4],
+    pub directional_light: DirectionalLight,
 }
 
 impl LightingSystem {
@@ -93,32 +146,13 @@ impl LightingSystem {
     ) {
         self.shader.use_program();
 
-        use inline_tweak::*;
         self.shader.set_mat4(c_str!("projection"), projection);
         self.shader.set_mat4(c_str!("view"), view);
         self.shader.set_vector3(c_str!("viewPos"), view_pos);
         self.shader.setFloat(c_str!("material.shininess"), 32.0);
 
-        self.shader.set_vec3(
-            c_str!("dirLight.direction"),
-            tweak!(-0.3),
-            tweak!(-1.0),
-            tweak!(-0.3),
-        );
-        self.shader.set_vec3(
-            c_str!("dirLight.ambient"),
-            tweak!(0.14),
-            tweak!(0.14),
-            tweak!(0.14),
-        );
-        self.shader.set_vec3(
-            c_str!("dirLight.diffuse"),
-            tweak!(0.4),
-            tweak!(0.4),
-            tweak!(0.4),
-        );
-        self.shader
-            .set_vec3(c_str!("dirLight.specular"), 0.5, 0.5, 0.5);
+        self.directional_light.shader_update(&self.shader);
+
         for (i, v) in self.point_lights.iter().enumerate() {
             v.shader_update(i, &self.shader);
         }
@@ -146,6 +180,7 @@ impl Default for LightingSystem {
                     ..PointLight::default()
                 },
             ],
+            directional_light: DirectionalLight::default(),
             shader: Shader::from_file(
                 "resources/shaders/multiple_lights.vs",
                 "resources/shaders/multiple_lights.fs",
