@@ -4,9 +4,11 @@ use crate::gaia::client::Client;
 use crate::gaia::components::{ModelComponent, Transform};
 use crate::gaia::consts;
 use crate::gaia::engine::Engine;
+use crate::gaia::light::*;
 use crate::gaia::sky::Sky;
 use crate::gaia::*;
-use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
+use cgmath::prelude::*;
+use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
 use imgui_glfw_rs::glfw;
 
 pub struct ExampleClient {
@@ -14,6 +16,7 @@ pub struct ExampleClient {
     camera: Camera,
     shader: shader::Shader,
     sky: Sky,
+    point_lights: Vec<PointLight>,
     show_object_info: bool,
     show_camera_info: bool,
     object_info_id: i32,
@@ -21,9 +24,19 @@ pub struct ExampleClient {
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
-        let sky;
-        unsafe {
-            sky = Sky::new();
+        let sky = unsafe { Sky::new() };
+        let pointLightPositions: [Vector3<f32>; 4] = [
+            vec3(0.7, 5.0, 2.0),
+            vec3(2.3, 3.3, -4.0),
+            vec3(-4.0, 4.0, -12.0),
+            vec3(0.0, 2.0, -3.0),
+        ];
+        let mut point_lights = vec![];
+        for light in pointLightPositions.iter() {
+            point_lights.push(PointLight {
+                pos: *light,
+                ..PointLight::default()
+            })
         }
         ExampleClient {
             object_info_id: 0,
@@ -40,10 +53,11 @@ impl ExampleClient {
                 ..Camera::default()
             },
             shader: shader::Shader::from_file(
-                "resources/shaders/model_loading.vs",
-                "resources/shaders/model_loading.fs",
+                "resources/shaders/multiple_lights.vs",
+                "resources/shaders/multiple_lights.fs",
             ),
             sky: sky,
+            point_lights: point_lights,
         }
     }
 }
@@ -85,10 +99,15 @@ impl Client for ExampleClient {
             },
             model: cache.get_model_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
         };
-        self.models = vec![tree, tree2, tree3, ground, robot];
+        let ruins = ModelComponent {
+            transform: Transform::default(),
+            model: cache.get_model("resources/objects/ruins/ruins.obj"),
+        };
+        self.models = vec![tree, tree2, tree3, ground, robot, ruins];
     }
 
     unsafe fn draw(&mut self) {
+        use inline_tweak::*;
         self.shader.use_program();
 
         // view/projection transformations
@@ -101,6 +120,34 @@ impl Client for ExampleClient {
         let view = self.camera.get_view_matrix();
         self.shader.set_mat4(c_str!("projection"), &projection);
         self.shader.set_mat4(c_str!("view"), &view);
+        self.shader
+            .set_vector3(c_str!("viewPos"), &self.camera.position.to_vec());
+        self.shader.setFloat(c_str!("material.shininess"), 32.0);
+
+        self.shader.set_vec3(
+            c_str!("dirLight.direction"),
+            tweak!(-0.3),
+            tweak!(-1.0),
+            tweak!(-0.3),
+        );
+        self.shader.set_vec3(
+            c_str!("dirLight.ambient"),
+            tweak!(0.14),
+            tweak!(0.14),
+            tweak!(0.14),
+        );
+        self.shader.set_vec3(
+            c_str!("dirLight.diffuse"),
+            tweak!(0.4),
+            tweak!(0.4),
+            tweak!(0.4),
+        );
+        self.shader
+            .set_vec3(c_str!("dirLight.specular"), 0.5, 0.5, 0.5);
+        // point light 1
+        for (i, v) in self.point_lights.iter().enumerate() {
+            v.shader_update(i, &self.shader);
+        }
 
         for model in self.models.iter() {
             model.draw(&self.shader);

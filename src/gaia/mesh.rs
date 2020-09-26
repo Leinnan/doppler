@@ -62,6 +62,15 @@ pub struct Mesh {
     EBO: u32,
 }
 
+impl Drop for Mesh {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteVertexArrays(1, &self.VAO);
+            gl::DeleteBuffers(1, &self.VBO);
+        }
+    }
+}
+
 impl Mesh {
     pub fn new(vertices: Vec<Vertex>, indices: Vec<u32>, textures: Vec<Texture>) -> Mesh {
         let mut mesh = Mesh {
