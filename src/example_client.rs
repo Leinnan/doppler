@@ -24,7 +24,7 @@ pub struct ExampleClient {
 }
 
 impl ExampleClient {
-    pub fn create() -> ExampleClient {
+    pub fn create(_window: &glfw::Window) -> ExampleClient {
         let sky = unsafe { Sky::new() };
         ExampleClient {
             object_info_id: 0,

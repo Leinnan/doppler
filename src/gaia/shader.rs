@@ -12,6 +12,7 @@ use crate::gaia::consts;
 use cgmath::prelude::*;
 use cgmath::{Matrix, Matrix4, Vector3};
 
+#[derive(Debug)]
 pub struct Shader {
     pub ID: u32,
 }

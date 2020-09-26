@@ -4,6 +4,7 @@ use crate::gaia::bg_info::BgInfo;
 use crate::gaia::camera::*;
 use crate::gaia::client::Client;
 use crate::gaia::consts;
+use crate::gaia::framebuffer::FramebufferSystem;
 use cgmath::Point3;
 use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
@@ -22,6 +23,7 @@ pub struct Engine {
     pub client: Box<dyn Client>,
     enable_debug_layer: bool,
     assets_cache: AssetsCache,
+    framebuffer: FramebufferSystem,
 }
 
 impl Engine {
@@ -54,10 +56,9 @@ impl Engine {
             // render
             // ------
             unsafe {
-                gl::ClearColor(self.bg_info.r, self.bg_info.g, self.bg_info.b, 1.0);
-                gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-
+                self.framebuffer.clear();
                 self.client.draw();
+                self.framebuffer.draw();
             }
 
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -264,6 +265,10 @@ impl Default for Engine {
         unsafe {
             gl::Enable(gl::DEPTH_TEST);
         }
+        let (scr_width, scr_height) = window.get_framebuffer_size();
+        let client = ExampleClient::create(&window);
+        let fb = unsafe { FramebufferSystem::generate(scr_width, scr_height) };
+        println!("{:?}", fb);
 
         Engine {
             bg_info: BgInfo::default(),
@@ -273,12 +278,13 @@ impl Default for Engine {
             glfw: glfw,
             imgui: imgui,
             imgui_glfw: imgui_glfw,
+            framebuffer: fb,
             camera: Camera {
                 position: Point3::new(0.0, 0.0, 3.0),
                 ..Camera::default()
             },
             enable_debug_layer: true,
-            client: Box::new(ExampleClient::create()),
+            client: Box::new(client),
             assets_cache: AssetsCache::default(),
         }
     }

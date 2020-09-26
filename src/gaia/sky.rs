@@ -1,4 +1,3 @@
-use crate::gaia::camera::*;
 use crate::gaia::shader::*;
 use crate::gaia::utils::*;
 use cgmath::Matrix4;
@@ -56,12 +55,12 @@ impl Sky {
         gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, stride, ptr::null());
 
         let faces = [
-            "resources/textures/skybox/right.jpg",
-            "resources/textures/skybox/left.jpg",
-            "resources/textures/skybox/top.jpg",
-            "resources/textures/skybox/bottom.jpg",
-            "resources/textures/skybox/back.jpg",
-            "resources/textures/skybox/front.jpg",
+            "resources/objects/skybox/right.jpg",
+            "resources/objects/skybox/left.jpg",
+            "resources/objects/skybox/top.jpg",
+            "resources/objects/skybox/bottom.jpg",
+            "resources/objects/skybox/back.jpg",
+            "resources/objects/skybox/front.jpg",
         ];
         let cubemap_texture = load_cubemap(&faces);
         shader.use_program();
