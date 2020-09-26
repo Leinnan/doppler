@@ -61,3 +61,67 @@ pub unsafe fn load_texture_from_dir(filename: &str, directory: &str) -> u32 {
 
     load_texture(&fullpath, format)
 }
+
+/// loads a cubemap texture from 6 individual texture faces
+/// order:
+/// +X (right)
+/// -X (left)
+/// +Y (top)
+/// -Y (bottom)
+/// +Z (front)
+/// -Z (back)
+/// -------------------------------------------------------
+pub unsafe fn load_cubemap(faces: &[&str]) -> u32 {
+    let mut texture_id = 0;
+    gl::GenTextures(1, &mut texture_id);
+    gl::BindTexture(gl::TEXTURE_CUBE_MAP, texture_id);
+
+    for (i, face) in faces.iter().enumerate() {
+        let (data, dim) = {
+            let img: ImagePtr<u8, Rgb> = io::read_u8(face).unwrap();
+            let img_data = img.data().to_vec();
+            let (x, y, _) = img.shape();
+
+            (img_data, (x as i32, y as i32))
+        };
+        gl::TexImage2D(
+            gl::TEXTURE_CUBE_MAP_POSITIVE_X + i as u32,
+            0,
+            gl::RGB as i32,
+            dim.0,
+            dim.1,
+            0,
+            gl::RGB,
+            gl::UNSIGNED_BYTE,
+            &data[0] as *const u8 as *const c_void,
+        );
+    }
+
+    gl::TexParameteri(
+        gl::TEXTURE_CUBE_MAP,
+        gl::TEXTURE_MIN_FILTER,
+        gl::LINEAR as i32,
+    );
+    gl::TexParameteri(
+        gl::TEXTURE_CUBE_MAP,
+        gl::TEXTURE_MAG_FILTER,
+        gl::LINEAR as i32,
+    );
+    gl::TexParameteri(
+        gl::TEXTURE_CUBE_MAP,
+        gl::TEXTURE_WRAP_S,
+        gl::CLAMP_TO_EDGE as i32,
+    );
+    gl::TexParameteri(
+        gl::TEXTURE_CUBE_MAP,
+        gl::TEXTURE_WRAP_T,
+        gl::CLAMP_TO_EDGE as i32,
+    );
+    gl::TexParameteri(
+        gl::TEXTURE_CUBE_MAP,
+        gl::TEXTURE_WRAP_R,
+        gl::CLAMP_TO_EDGE as i32,
+    );
+
+    texture_id
+}

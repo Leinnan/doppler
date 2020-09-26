@@ -4,6 +4,7 @@ use crate::gaia::client::Client;
 use crate::gaia::components::{ModelComponent, Transform};
 use crate::gaia::consts;
 use crate::gaia::engine::Engine;
+use crate::gaia::sky::Sky;
 use crate::gaia::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
 use imgui_glfw_rs::glfw;
@@ -12,6 +13,7 @@ pub struct ExampleClient {
     models: Vec<ModelComponent>,
     camera: Camera,
     shader: shader::Shader,
+    sky: Sky,
     show_object_info: bool,
     show_camera_info: bool,
     object_info_id: i32,
@@ -19,6 +21,10 @@ pub struct ExampleClient {
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
+        let sky;
+        unsafe {
+            sky = Sky::new();
+        }
         ExampleClient {
             object_info_id: 0,
             show_camera_info: true,
@@ -37,6 +43,7 @@ impl ExampleClient {
                 "resources/shaders/model_loading.vs",
                 "resources/shaders/model_loading.fs",
             ),
+            sky: sky,
         }
     }
 }
@@ -60,10 +67,7 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: cache.get_model_ext(
-                "resources/objects/tree/tree_6_d.obj",
-                Some("tree_e.png")
-            ),
+            model: cache.get_model_ext("resources/objects/tree/tree_6_d.obj", Some("tree_e.png")),
         };
         let tree2 = ModelComponent {
             transform: Transform {
@@ -71,10 +75,7 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: cache.get_model_ext(
-                "resources/objects/tree/tree_6_c.obj",
-                Some("tree_e.png")
-            ),
+            model: cache.get_model_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
         };
         let tree3 = ModelComponent {
             transform: Transform {
@@ -82,10 +83,7 @@ impl Client for ExampleClient {
                 scale: vec3(2.5, 2.5, 2.5),
                 ..Transform::default()
             },
-            model: cache.get_model_ext(
-                "resources/objects/tree/tree_6_c.obj",
-                Some("tree_e.png")
-            ),
+            model: cache.get_model_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
         };
         self.models = vec![tree, tree2, tree3, ground, robot];
     }
@@ -107,6 +105,7 @@ impl Client for ExampleClient {
         for model in self.models.iter() {
             model.draw(&self.shader);
         }
+        self.sky.draw(view, projection);
     }
     fn update(&mut self, _engine: &mut Engine) {}
 

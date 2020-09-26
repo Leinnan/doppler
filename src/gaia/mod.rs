@@ -10,4 +10,5 @@ pub mod engine;
 pub mod mesh;
 pub mod model;
 pub mod shader;
+pub mod sky;
 pub mod utils;
