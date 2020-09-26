@@ -49,6 +49,12 @@ pub struct Texture {
     pub path: String,
 }
 
+impl Drop for Texture {
+    fn drop(&mut self) {
+        unsafe { gl::DeleteTextures(1, &self.id); }
+    }
+}
+
 #[derive(Clone)]
 pub struct Mesh {
     /*  Mesh Data  */

@@ -127,6 +127,7 @@ impl Engine {
                     // height will be significantly larger than specified on retina displays.
                     unsafe { gl::Viewport(0, 0, width, height) }
                     self.window_size = (width as f32, height as f32);
+                    self.framebuffer = unsafe { FramebufferSystem::generate(width, height) };
                 }
                 glfw::WindowEvent::CursorPos(xpos, ypos) => {
                     if skip_input {
@@ -265,8 +266,8 @@ impl Default for Engine {
         unsafe {
             gl::Enable(gl::DEPTH_TEST);
         }
-        let (scr_width, scr_height) = window.get_framebuffer_size();
         let client = ExampleClient::create(&window);
+        let (scr_width, scr_height) = window.get_framebuffer_size();
         let fb = unsafe { FramebufferSystem::generate(scr_width, scr_height) };
         println!("{:?}", fb);
 

@@ -10,11 +10,17 @@ use gl::types::*;
 
 use crate::gaia::consts;
 use cgmath::prelude::*;
-use cgmath::{Matrix, Matrix4, Vector3};
+use cgmath::{Matrix, Matrix4, Vector3, Vector2};
 
 #[derive(Debug)]
 pub struct Shader {
     pub ID: u32,
+}
+
+impl Drop for Shader {
+    fn drop(&mut self) {
+        unsafe{gl::DeleteShader(self.ID);}
+    }
 }
 
 impl Default for Shader {
@@ -103,6 +109,13 @@ impl Shader {
     /// ------------------------------------------------------------------------
     pub unsafe fn set_vector3(&self, name: &CStr, value: &Vector3<f32>) {
         gl::Uniform3fv(
+            gl::GetUniformLocation(self.ID, name.as_ptr()),
+            1,
+            value.as_ptr(),
+        );
+    }
+    pub unsafe fn set_vector2(&self, name: &CStr, value: &Vector2<f32>) {
+        gl::Uniform2fv(
             gl::GetUniformLocation(self.ID, name.as_ptr()),
             1,
             value.as_ptr(),

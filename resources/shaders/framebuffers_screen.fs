@@ -3,10 +3,17 @@ out vec4 FragColor;
 
 in vec2 TexCoords;
 
+uniform float screen_width;
+uniform float screen_height;
 uniform sampler2D screenTexture;
 
 void main()
 {
-    vec3 col = texture(screenTexture, TexCoords).rgb;
-    FragColor = vec4(col, 1.0);
+    vec2 uv = TexCoords.xy;
+    uv *=  1.0 - uv.yx;
+    float vig = uv.x*uv.y * 15.0;
+    vig = pow(vig, 0.3);
+
+    
+    FragColor = texture(screenTexture, TexCoords) * vig;
 }

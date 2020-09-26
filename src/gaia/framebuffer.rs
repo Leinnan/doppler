@@ -15,9 +15,11 @@ pub struct FramebufferSystem {
 
 impl Drop for FramebufferSystem {
     fn drop(&mut self) {
+        println!("Drop framebuffer!");
         unsafe {
             gl::DeleteVertexArrays(1, &self.vao);
             gl::DeleteBuffers(1, &self.vbo);
+            gl::DeleteFramebuffers(1, &self.framebuffer);
         }
     }
 }
@@ -85,6 +87,8 @@ impl FramebufferSystem {
         );
         screenShader.use_program();
         screenShader.setInt(c_str!("screenTexture"), 0);
+        screenShader.setFloat(c_str!("screen_width"), scr_width as f32);
+        screenShader.setFloat(c_str!("screen_height"), scr_height as f32);
 
         // framebuffer configuration
         // -------------------------
