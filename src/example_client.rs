@@ -14,30 +14,18 @@ use imgui_glfw_rs::glfw;
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
     camera: Camera,
-    shader: shader::Shader,
+    lighting_system: LightingSystem,
     sky: Sky,
-    point_lights: Vec<PointLight>,
     show_object_info: bool,
     show_camera_info: bool,
     object_info_id: i32,
+    show_light_info: bool,
+    light_info_id: i32,
 }
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
         let sky = unsafe { Sky::new() };
-        let pointLightPositions: [Vector3<f32>; 4] = [
-            vec3(0.7, 5.0, 2.0),
-            vec3(2.3, 3.3, -4.0),
-            vec3(-4.0, 4.0, -12.0),
-            vec3(0.0, 2.0, -3.0),
-        ];
-        let mut point_lights = vec![];
-        for light in pointLightPositions.iter() {
-            point_lights.push(PointLight {
-                pos: *light,
-                ..PointLight::default()
-            })
-        }
         ExampleClient {
             object_info_id: 0,
             show_camera_info: true,
@@ -52,12 +40,10 @@ impl ExampleClient {
                 pitch: -20.0,
                 ..Camera::default()
             },
-            shader: shader::Shader::from_file(
-                "resources/shaders/multiple_lights.vs",
-                "resources/shaders/multiple_lights.fs",
-            ),
+            lighting_system: LightingSystem::default(),
             sky: sky,
-            point_lights: point_lights,
+            show_light_info: false,
+            light_info_id: 0,
         }
     }
 }
@@ -107,9 +93,6 @@ impl Client for ExampleClient {
     }
 
     unsafe fn draw(&mut self) {
-        use inline_tweak::*;
-        self.shader.use_program();
-
         // view/projection transformations
         let projection: Matrix4<f32> = perspective(
             Deg(self.camera.zoom),
@@ -118,39 +101,12 @@ impl Client for ExampleClient {
             1000.0,
         );
         let view = self.camera.get_view_matrix();
-        self.shader.set_mat4(c_str!("projection"), &projection);
-        self.shader.set_mat4(c_str!("view"), &view);
-        self.shader
-            .set_vector3(c_str!("viewPos"), &self.camera.position.to_vec());
-        self.shader.setFloat(c_str!("material.shininess"), 32.0);
-
-        self.shader.set_vec3(
-            c_str!("dirLight.direction"),
-            tweak!(-0.3),
-            tweak!(-1.0),
-            tweak!(-0.3),
-        );
-        self.shader.set_vec3(
-            c_str!("dirLight.ambient"),
-            tweak!(0.14),
-            tweak!(0.14),
-            tweak!(0.14),
-        );
-        self.shader.set_vec3(
-            c_str!("dirLight.diffuse"),
-            tweak!(0.4),
-            tweak!(0.4),
-            tweak!(0.4),
-        );
-        self.shader
-            .set_vec3(c_str!("dirLight.specular"), 0.5, 0.5, 0.5);
-        // point light 1
-        for (i, v) in self.point_lights.iter().enumerate() {
-            v.shader_update(i, &self.shader);
-        }
+        let view_pos = self.camera.position.to_vec();
+        self.lighting_system
+            .prepare_for_draw(&projection, &view, &view_pos);
 
         for model in self.models.iter() {
-            model.draw(&self.shader);
+            model.draw(&self.lighting_system.shader);
         }
         self.sky.draw(view, projection);
     }
@@ -189,6 +145,12 @@ impl Client for ExampleClient {
                 {
                     self.show_object_info = !self.show_object_info;
                 }
+                if MenuItem::new(im_str!("Show lights info"))
+                    .selected(self.show_light_info)
+                    .build(ui)
+                {
+                    self.show_light_info = !self.show_light_info;
+                }
                 if MenuItem::new(im_str!("Show camera info"))
                     .selected(self.show_camera_info)
                     .build(ui)
@@ -219,8 +181,8 @@ impl Client for ExampleClient {
         if self.show_object_info {
             let mut id = self.object_info_id;
             let max: i32 = self.models.len() as i32 - 1;
-            println!("max: {}", max);
             let mut show_window = self.show_object_info;
+
             Window::new(im_str!("Object info"))
                 .size([250.0, 250.0], Condition::FirstUseEver)
                 .opened(&mut show_window)
@@ -237,6 +199,35 @@ impl Client for ExampleClient {
                 });
             self.object_info_id = id;
             self.show_object_info = show_window;
+        }
+        if self.show_light_info {
+            let mut id = self.light_info_id;
+            let max: i32 = self.lighting_system.point_lights.len() as i32 - 1;
+            let mut show_window = self.show_light_info;
+
+            Window::new(im_str!("Lights info"))
+                .size([250.0, 250.0], Condition::FirstUseEver)
+                .opened(&mut show_window)
+                .build(&ui, || {
+                    ui.drag_int(im_str!("Light ID"), &mut id)
+                        .min(0)
+                        .max(max)
+                        .build();
+                    // id = if id < 0 { 0 } else if id > max { max } else { id };
+                    let mut selected_mut =
+                        vec![&mut self.lighting_system.point_lights[id as usize]];
+                    <PointLight as imgui_inspect::InspectRenderStruct<PointLight>>::render_mut(
+                        &mut selected_mut,
+                        "PointLightInfo",
+                        &ui,
+                        &InspectArgsStruct::default(),
+                    );
+                    if ui.button(im_str!("Print light info"), [0.0, 0.0]) {
+                        println!("{:?}",selected_mut);
+                    }
+                });
+            self.light_info_id = id;
+            self.show_light_info = show_window;
         }
     }
 

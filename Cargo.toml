@@ -10,18 +10,15 @@ panic = 'abort'
 lto = true
 
 [dependencies]
-cgmath = "0.17.0"
 gl = "0.14.0"
 imgui-glfw-rs = { git = "https://github.com/Leinnan/imgui-glfw-rs" }
+cgmath = "0.17.0"
 imgui-inspect = "0.5.0"
 imgui-inspect-derive = "0.5.0"
 tobj = "2.0.2"
 human-panic = "1.0.3"
 inline_tweak = "1.0.8"
 image2 = { git = "https://github.com/Leinnan/image2-rs", branch="legacy", default-features = false, features=["io"] }
-# serde = "1.0.116"
-# serde_derive = "1.0.116"
-# assets_manager ={ version="0.3.2", features= ["ron", "bincode"]}
 
 [profile.dev.package."*"]
 opt-level = 2

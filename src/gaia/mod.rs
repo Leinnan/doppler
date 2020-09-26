@@ -7,6 +7,7 @@ pub mod client;
 pub mod components;
 pub mod consts;
 pub mod engine;
+pub mod imgui_helper;
 pub mod light;
 pub mod mesh;
 pub mod model;
