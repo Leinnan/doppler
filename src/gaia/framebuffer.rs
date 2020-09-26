@@ -15,7 +15,6 @@ pub struct FramebufferSystem {
 
 impl Drop for FramebufferSystem {
     fn drop(&mut self) {
-        println!("Drop framebuffer!");
         unsafe {
             gl::DeleteVertexArrays(1, &self.vao);
             gl::DeleteBuffers(1, &self.vbo);

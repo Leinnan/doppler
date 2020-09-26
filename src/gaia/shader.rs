@@ -10,7 +10,7 @@ use gl::types::*;
 
 use crate::gaia::consts;
 use cgmath::prelude::*;
-use cgmath::{Matrix, Matrix4, Vector3, Vector2};
+use cgmath::{Matrix, Matrix4, Vector2, Vector3};
 
 #[derive(Debug)]
 pub struct Shader {
@@ -19,7 +19,9 @@ pub struct Shader {
 
 impl Drop for Shader {
     fn drop(&mut self) {
-        unsafe{gl::DeleteShader(self.ID);}
+        unsafe {
+            gl::DeleteShader(self.ID);
+        }
     }
 }
 

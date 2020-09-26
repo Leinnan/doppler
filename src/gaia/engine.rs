@@ -82,6 +82,7 @@ impl Engine {
                     )
                     .no_decoration()
                     .no_inputs()
+                    .bg_alpha(0.8)
                     .save_settings(false)
                     .build(&ui, || {
                         ui.text("Welcome in doppler world!");

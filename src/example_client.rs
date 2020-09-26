@@ -162,20 +162,26 @@ impl Client for ExampleClient {
             menu_bar.end(ui);
         }
         if self.show_camera_info {
-            let text = format!("{:?}", self.camera)
-                .replace("{", "{\n")
-                .replace("}", "\n}")
-                .replace("],", "],\n");
             Window::new(im_str!("CameraInfo"))
-                .size([300.0, 300.0], Condition::Always)
-                .position([50.0, 50.0], Condition::Always)
+                .size([260.0, 430.0], Condition::Always)
+                .position([40.0, 40.0], Condition::Always)
                 .title_bar(false)
                 .scroll_bar(false)
+                .no_inputs()
+                .bg_alpha(0.8)
                 .collapsible(false)
                 .build(&ui, || {
                     ui.text(im_str!("Camera info"));
                     ui.separator();
-                    ui.text(text);
+                    <Camera as imgui_inspect::InspectRenderDefault<Camera>>::render(
+                        &[&self.camera],
+                        &"CameraInfo",
+                        ui,
+                        &imgui_inspect::InspectArgsDefault {
+                            header: Some(false),
+                            ..imgui_inspect::InspectArgsDefault::default()
+                        },
+                    );
                 });
         }
         if self.show_object_info {

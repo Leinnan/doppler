@@ -1,8 +1,11 @@
 #![allow(dead_code)]
 
+use crate::gaia::imgui_helper::*;
 use cgmath;
 use cgmath::prelude::*;
 use cgmath::vec3;
+use imgui_glfw_rs::imgui;
+use imgui_inspect_derive::Inspect;
 
 type Point3 = cgmath::Point3<f32>;
 type Vector3 = cgmath::Vector3<f32>;
@@ -25,13 +28,18 @@ const SPEED: f32 = 2.5;
 const SENSITIVTY: f32 = 0.1;
 const ZOOM: f32 = 45.0;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Inspect, Debug, Clone, Copy)]
 pub struct Camera {
     // Camera Attributes
+    #[inspect(proxy_type = "CgmathPoint3f32")]
     pub position: Point3,
+    #[inspect(proxy_type = "CgmathVec3f32")]
     pub front: Vector3,
+    #[inspect(proxy_type = "CgmathVec3f32")]
     pub up: Vector3,
+    #[inspect(proxy_type = "CgmathVec3f32")]
     pub right: Vector3,
+    #[inspect(proxy_type = "CgmathVec3f32")]
     pub worldup: Vector3,
     // Euler Angles
     pub yaw: f32,
