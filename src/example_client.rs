@@ -61,6 +61,19 @@ impl Client for ExampleClient {
             transform: Transform::default(),
             model: cache.get_model("resources/objects/robot/robot.obj"),
         };
+        let grass = ModelComponent {
+            transform: Transform::default(),
+            model: cache.get_model_ext("resources/objects/grass/grass.obj", Some("foliage.png")),
+        };
+        let gaz_tank = ModelComponent {
+            transform: Transform {
+                position: vec3(8.3, 0.0, 3.0),
+                rotation: vec3(0.0,120.0,0.0),
+                scale: 0.025,
+                ..Transform::default()
+            },
+            model: cache.get_model("resources/objects/gaz_tank/gaz_tank.obj"),
+        };
         let tree = ModelComponent {
             transform: Transform {
                 position: vec3(10.0, 0.0, 26.0),
@@ -89,7 +102,7 @@ impl Client for ExampleClient {
             transform: Transform::default(),
             model: cache.get_model("resources/objects/ruins/ruins.obj"),
         };
-        self.models = vec![tree, tree2, tree3, ground, robot, ruins];
+        self.models = vec![tree, tree2, tree3, ground, robot, ruins,gaz_tank, grass];
     }
 
     unsafe fn draw(&mut self) {
