@@ -1,14 +1,11 @@
 use gl;
 use image2::image::Image;
 use image2::{io, ImagePtr, Rgb, Rgba};
-use std::os::raw::c_void;
 use log::{info, trace, warn};
+use std::os::raw::c_void;
 
 pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
-    info!(
-        "Loading texture: {}",
-        path
-    );
+    info!("Loading texture: {}", path);
     let mut id = 0;
 
     gl::GenTextures(1, &mut id);

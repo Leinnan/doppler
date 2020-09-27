@@ -91,6 +91,34 @@ impl Engine {
                         ui.separator();
                         ui.text(format!("Mouse position: ({:4.1},{:4.1})", last_x, last_y));
                     });
+                Window::new(im_str!("Logs"))
+                    .size([670.0, 215.0], Condition::Always)
+                    .bg_alpha(0.8)
+                    .position(
+                        [offset, self.window_size.1 - 215.0 - offset],
+                        Condition::Always,
+                    )
+                    .no_decoration()
+                    .no_inputs()
+                    .bg_alpha(0.8)
+                    .save_settings(false)
+                    .build(&ui, || {
+                        use std::fs;
+                        use std::io::prelude::*;
+                        use std::io::BufReader;
+                        let buf = BufReader::new(fs::File::open("log.log").expect("no such file"));
+                        let lines: Vec<String> = buf
+                            .lines()
+                            .map(|l| l.expect("Could not parse line"))
+                            .collect();
+                        let mut output = String::new();
+                        lines.iter().rev().take(10).rev().for_each(|line| {
+                            output.push_str(&line);
+                            output.push('\n');
+                        });
+
+                        ui.text(output);
+                    });
                 self.imgui_glfw.draw(ui, &mut self.window);
             }
 

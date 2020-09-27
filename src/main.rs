@@ -9,10 +9,10 @@ extern crate simple_logging;
 mod gaia;
 mod example_client;
 
+use crate::gaia::engine::Engine;
+use human_panic::setup_panic;
 use log::LevelFilter;
 use log::{info, trace, warn};
-use human_panic::setup_panic;
-use crate::gaia::engine::Engine;
 
 pub fn main() {
     setup_panic!();

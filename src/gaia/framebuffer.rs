@@ -1,9 +1,9 @@
 use crate::gaia::shader::*;
 use gl::types::*;
+use log::{info, trace, warn};
 use std::mem;
 use std::os::raw::c_void;
 use std::ptr;
-use log::{info, trace, warn};
 
 #[derive(Debug)]
 pub struct FramebufferSystem {
@@ -49,7 +49,10 @@ impl FramebufferSystem {
         gl::DrawArrays(gl::TRIANGLES, 0, 6);
     }
     pub unsafe fn generate(scr_width: i32, scr_height: i32) -> Self {
-        info!("Generating new framebuffer with dimensions {}x{}",scr_width,scr_height);
+        info!(
+            "Generating new framebuffer with dimensions {}x{}",
+            scr_width, scr_height
+        );
         let screenShader = Shader::from_file(
             "resources/shaders/framebuffers_screen.vs",
             "resources/shaders/framebuffers_screen.fs",
@@ -143,7 +146,7 @@ impl FramebufferSystem {
         gl::BindFramebuffer(gl::FRAMEBUFFER, 0);
 
         info!("New framebuffer generated");
-        
+
         FramebufferSystem {
             texture_color_buffer: textureColorbuffer,
             shader: screenShader,

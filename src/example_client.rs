@@ -164,7 +164,7 @@ impl Client for ExampleClient {
         if self.show_camera_info {
             Window::new(im_str!("CameraInfo"))
                 .size([260.0, 430.0], Condition::Always)
-                .position([40.0, 40.0], Condition::Always)
+                .position([20.0, 40.0], Condition::Always)
                 .title_bar(false)
                 .scroll_bar(false)
                 .no_inputs()
