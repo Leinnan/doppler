@@ -7,6 +7,9 @@ uniform float screen_width;
 uniform float screen_height;
 uniform sampler2D screenTexture;
 
+uniform float pixelWidth = 3.0;
+uniform float pixelHeight = 3.0;
+
 void main()
 {
     vec2 uv = TexCoords.xy;
@@ -14,6 +17,12 @@ void main()
     float vig = uv.x*uv.y * 15.0;
     vig = pow(vig, 0.3);
 
+    float dx = pixelWidth*(1.0/screen_width);
+    float dy = pixelHeight*(1.0/screen_height);
+
+    vec2 coord = vec2(dx*floor(TexCoords.x/dx), dy*floor(TexCoords.y/dy));
+
+    vec3 tc = texture(screenTexture, coord).rgb;
     
-    FragColor = texture(screenTexture, TexCoords) * vig;
+    FragColor = vec4(tc,1.0) * vig;
 }
