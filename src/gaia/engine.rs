@@ -10,6 +10,7 @@ use imgui_glfw_rs::glfw;
 use imgui_glfw_rs::glfw::{Action, Context, Key};
 use imgui_glfw_rs::imgui;
 use imgui_glfw_rs::ImguiGLFW;
+use log::{info, trace, warn};
 
 pub struct Engine {
     pub camera: Camera,
@@ -270,7 +271,6 @@ impl Default for Engine {
         let client = ExampleClient::create(&window);
         let (scr_width, scr_height) = window.get_framebuffer_size();
         let fb = unsafe { FramebufferSystem::generate(scr_width, scr_height) };
-        println!("{:?}", fb);
 
         Engine {
             bg_info: BgInfo::default(),

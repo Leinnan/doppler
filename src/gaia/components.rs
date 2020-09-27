@@ -8,19 +8,18 @@ use imgui_inspect_derive::Inspect;
 #[derive(Inspect, Clone, Copy, Debug)]
 pub struct Transform {
     #[inspect(proxy_type = "CgmathVec3f32")]
-    pub scale: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
     pub position: Vector3<f32>,
     #[inspect(proxy_type = "CgmathVec3f32")]
     pub rotation: Vector3<f32>,
+    pub scale: f32,
 }
 
 impl Default for Transform {
     fn default() -> Transform {
         Transform {
             position: vec3(0.0, 0.0, 0.0),
-            scale: vec3(1.0, 1.0, 1.0),
             rotation: vec3(0.0, 0.0, 0.0),
+            scale: 1.0,
         }
     }
 }
@@ -28,7 +27,7 @@ impl Default for Transform {
 impl Transform {
     pub fn get_matrix(&self) -> Matrix4<f32> {
         let mut m = Matrix4::<f32>::from_translation(self.position);
-        m = m * Matrix4::from_nonuniform_scale(self.scale.x, self.scale.y, self.scale.z);
+        m = m * Matrix4::from_scale(self.scale);
         m = m * Matrix4::<f32>::from_angle_x(Rad(self.rotation.x.to_radians()));
         m = m * Matrix4::<f32>::from_angle_y(Rad(self.rotation.y.to_radians()));
         m = m * Matrix4::<f32>::from_angle_z(Rad(self.rotation.z.to_radians()));

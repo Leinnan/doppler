@@ -3,6 +3,7 @@ use crate::gaia::model::Model;
 use crate::gaia::utils::load_texture_from_dir;
 use std::collections::HashMap;
 use std::path::Path;
+use log::{info, trace, warn};
 
 #[derive(Default)]
 pub struct AssetsCache {
@@ -15,7 +16,7 @@ impl AssetsCache {
         match self.models.get(path) {
             Some(model) => model.clone(),
             None => {
-                println!("Loading model: {}", path);
+                info!("Loading model: {}", path);
                 let model = Model::new(path, self);
                 self.models.insert(path.to_string(), model.clone());
                 model
@@ -27,7 +28,7 @@ impl AssetsCache {
         match self.models.get(path) {
             Some(model) => model.clone(),
             None => {
-                println!("Loading model: {}", path);
+                info!("Loading model: {}", path);
                 let model = Model::new_ext(path, diff_texture, self);
                 self.models.insert(path.to_string(), model.clone());
                 model
@@ -40,7 +41,6 @@ impl AssetsCache {
             Some(texture) => texture.clone(),
             None => {
                 let directory: String = dir.into();
-                println!("Loading texture: {}", path);
                 let texture = Texture {
                     id: unsafe { load_texture_from_dir(path, &directory) },
                     type_: type_name.into(),

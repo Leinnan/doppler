@@ -2,14 +2,22 @@
 
 extern crate gl;
 extern crate imgui_glfw_rs;
-use human_panic::setup_panic;
+extern crate log;
+extern crate simple_logging;
+
 #[macro_use]
 mod gaia;
 mod example_client;
+
+use log::LevelFilter;
+use log::{info, trace, warn};
+use human_panic::setup_panic;
 use crate::gaia::engine::Engine;
 
 pub fn main() {
     setup_panic!();
+    simple_logging::log_to_file("log.log", LevelFilter::Info);
+    info!("Starting engine!");
     let mut engine = Engine::default();
 
     engine.run();

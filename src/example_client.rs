@@ -27,9 +27,6 @@ impl ExampleClient {
     pub fn create(_window: &glfw::Window) -> ExampleClient {
         let sky = unsafe { Sky::new() };
         ExampleClient {
-            object_info_id: 0,
-            show_camera_info: true,
-            show_object_info: false,
             models: vec![],
             camera: Camera {
                 position: Point3::new(0.0, 8.0, 13.0),
@@ -42,6 +39,9 @@ impl ExampleClient {
             },
             lighting_system: LightingSystem::default(),
             sky: sky,
+            object_info_id: 0,
+            show_camera_info: false,
+            show_object_info: false,
             show_light_info: false,
             light_info_id: 0,
         }
@@ -52,7 +52,7 @@ impl Client for ExampleClient {
     fn load_assets(&mut self, cache: &mut AssetsCache) {
         let ground = ModelComponent {
             transform: Transform {
-                scale: vec3(0.5, 0.5, 0.5),
+                scale: 0.56,
                 ..Transform::default()
             },
             model: cache.get_model("resources/objects/ground/ground.obj"),
@@ -64,7 +64,7 @@ impl Client for ExampleClient {
         let tree = ModelComponent {
             transform: Transform {
                 position: vec3(10.0, 0.0, 26.0),
-                scale: vec3(2.5, 2.5, 2.5),
+                scale: 2.5,
                 ..Transform::default()
             },
             model: cache.get_model_ext("resources/objects/tree/tree_6_d.obj", Some("tree_e.png")),
@@ -72,7 +72,7 @@ impl Client for ExampleClient {
         let tree2 = ModelComponent {
             transform: Transform {
                 position: vec3(-9.0, 0.0, -15.0),
-                scale: vec3(2.5, 2.5, 2.5),
+                scale: 2.5,
                 ..Transform::default()
             },
             model: cache.get_model_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
@@ -80,7 +80,7 @@ impl Client for ExampleClient {
         let tree3 = ModelComponent {
             transform: Transform {
                 position: vec3(15.0, 0.0, -7.0),
-                scale: vec3(2.5, 2.5, 2.5),
+                scale: 2.5,
                 ..Transform::default()
             },
             model: cache.get_model_ext("resources/objects/tree/tree_6_c.obj", Some("tree_e.png")),
@@ -151,13 +151,13 @@ impl Client for ExampleClient {
                 {
                     self.show_light_info = !self.show_light_info;
                 }
-                if MenuItem::new(im_str!("Show camera info"))
-                    .selected(self.show_camera_info)
-                    .build(ui)
-                {
-                    self.show_camera_info = !self.show_camera_info;
-                }
                 menu.end(ui);
+            }
+            if MenuItem::new(im_str!("Toggle Camera Info"))
+                .selected(self.show_camera_info)
+                .build(ui)
+            {
+                self.show_camera_info = !self.show_camera_info;
             }
             menu_bar.end(ui);
         }

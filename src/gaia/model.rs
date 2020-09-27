@@ -8,6 +8,7 @@ use crate::gaia::utils::*;
 use cgmath::{vec2, vec3};
 use std::path::Path;
 use tobj;
+use log::{info, trace, warn};
 
 #[derive(Clone)]
 pub struct Model {
@@ -50,7 +51,7 @@ impl Model {
     // loads a model from file and stores the resulting meshes in the meshes vector.
     fn load_model(&mut self, path: &str, diffuse_path: Option<&str>, cache: &mut AssetsCache) {
         let path = Path::new(path);
-        println!("Started loading model from path: {}", path.display());
+        // println!("Started loading model from path: {}", path.display());
 
         // retrieve the directory path of the filepath
         self.directory = path
@@ -114,7 +115,7 @@ impl Model {
                 }
             // NOTE: no height maps
             } else if diffuse_path.is_some() {
-                println!("Loading {}", &diffuse_path.unwrap());
+                // println!("Loading {}", &diffuse_path.unwrap());
                 let texture = cache.get_material_texture(
                     &self.directory,
                     &diffuse_path.unwrap(),
@@ -122,11 +123,11 @@ impl Model {
                 );
                 textures.push(texture);
             } else {
-                println!("There are no materials for: {}", path.display());
+                warn!("There are no materials for: {}", path.display());
             }
 
             self.meshes.push(Mesh::new(vertices, indices, textures));
         }
-        println!("Finished loading model from path: {}", path.display());
+        info!("Finished loading model");
     }
 }

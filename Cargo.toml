@@ -18,6 +18,8 @@ imgui-inspect-derive = "0.5.0"
 tobj = "2.0.2"
 human-panic = "1.0.3"
 inline_tweak = "1.0.8"
+log = "0.4.11"
+simple-logging = "2.0.2"
 image2 = { git = "https://github.com/Leinnan/image2-rs", branch="legacy", default-features = false, features=["io"] }
 
 [profile.dev.package."*"]

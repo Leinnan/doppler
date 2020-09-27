@@ -2,11 +2,12 @@ use gl;
 use image2::image::Image;
 use image2::{io, ImagePtr, Rgb, Rgba};
 use std::os::raw::c_void;
+use log::{info, trace, warn};
 
 pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
-    println!(
-        "[stb]Loading texture from path: {} with format {}",
-        path, file_format
+    info!(
+        "Loading texture: {}",
+        path
     );
     let mut id = 0;
 
