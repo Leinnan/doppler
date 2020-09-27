@@ -23,7 +23,7 @@ simple-logging = "2.0.2"
 image2 = { git = "https://github.com/Leinnan/image2-rs", branch="legacy", default-features = false, features=["io"] }
 
 [features]
-default = ["no_imgui"]
+default = ["imgui_inspect"]
 imgui_inspect = ["imgui-inspect-derive", "imgui-inspect", "imgui-glfw-rs"]
 no_imgui = ["glfw"]
 

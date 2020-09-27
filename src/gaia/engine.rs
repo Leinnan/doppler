@@ -7,15 +7,14 @@ use crate::gaia::framebuffer::FramebufferSystem;
 use cgmath::Point3;
 #[cfg(feature = "no_imgui")]
 use glfw;
-use glfw::{Action, Context, Key};
-#[cfg(feature = "imgui_inspect")]
-use imgui_glfw_rs::glfw;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::ImguiGLFW;
+
+use glfw::{Action, Context, Key};
 use log::{info, trace, warn};
 
 pub struct Engine {
