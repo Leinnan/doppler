@@ -9,6 +9,9 @@ use crate::gaia::sky::Sky;
 use crate::gaia::*;
 use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
+#[cfg(feature = "no_imgui")]
+use glfw;
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
 
 pub struct ExampleClient {
@@ -68,7 +71,7 @@ impl Client for ExampleClient {
         let gaz_tank = ModelComponent {
             transform: Transform {
                 position: vec3(8.3, 0.0, 3.0),
-                rotation: vec3(0.0,120.0,0.0),
+                rotation: vec3(0.0, 120.0, 0.0),
                 scale: 0.025,
                 ..Transform::default()
             },
@@ -102,7 +105,7 @@ impl Client for ExampleClient {
             transform: Transform::default(),
             model: cache.get_model("resources/objects/ruins/ruins.obj"),
         };
-        self.models = vec![tree, tree2, tree3, ground, robot, ruins,gaz_tank, grass];
+        self.models = vec![tree, tree2, tree3, ground, robot, ruins, gaz_tank, grass];
     }
 
     unsafe fn draw(&mut self) {
@@ -126,7 +129,7 @@ impl Client for ExampleClient {
     fn update(&mut self, _engine: &mut Engine) {}
 
     fn process_input(&mut self, window: &glfw::Window, delta: f32) {
-        use imgui_glfw_rs::glfw::{Action, Key};
+        use glfw::{Action, Key};
         if window.get_key(Key::W) == Action::Press {
             self.camera.process_keyboard(CameraMovement::FORWARD, delta);
         }
@@ -147,9 +150,9 @@ impl Client for ExampleClient {
         }
     }
 
+    #[cfg(feature = "imgui_inspect")]
     fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui) {
         use imgui_glfw_rs::imgui::*;
-        use imgui_inspect::InspectArgsStruct;
         if let Some(menu_bar) = ui.begin_main_menu_bar() {
             if let Some(menu) = ui.begin_menu(im_str!("Basic"), true) {
                 if MenuItem::new(im_str!("Show Object info"))
@@ -174,57 +177,61 @@ impl Client for ExampleClient {
             }
             menu_bar.end(ui);
         }
-        if self.show_camera_info {
-            Window::new(im_str!("CameraInfo"))
-                .size([260.0, 430.0], Condition::Always)
-                .position([20.0, 40.0], Condition::Always)
-                .title_bar(false)
-                .scroll_bar(false)
-                .no_inputs()
-                .bg_alpha(0.8)
-                .collapsible(false)
-                .build(&ui, || {
-                    ui.text(im_str!("Camera info"));
-                    ui.separator();
-                    <Camera as imgui_inspect::InspectRenderDefault<Camera>>::render(
-                        &[&self.camera],
-                        &"CameraInfo",
-                        ui,
-                        &imgui_inspect::InspectArgsDefault {
-                            header: Some(false),
-                            ..imgui_inspect::InspectArgsDefault::default()
-                        },
-                    );
-                });
-        }
-        if self.show_object_info {
-            let mut id = self.object_info_id;
-            let max: i32 = self.models.len() as i32 - 1;
-            let mut show_window = self.show_object_info;
 
-            Window::new(im_str!("Object info"))
-                .size([250.0, 250.0], Condition::FirstUseEver)
-                .opened(&mut show_window)
-                .build(&ui, || {
-                    ui.drag_int(im_str!("id"), &mut id).min(0).max(max).build();
+        {
+            use imgui_inspect::InspectArgsStruct;
 
-                    let mut selected_mut = vec![&mut self.models[id as usize].transform];
-                    <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
-                        &mut selected_mut,
-                        "Object info",
-                        &ui,
-                        &InspectArgsStruct::default(),
-                    );
-                });
-            self.object_info_id = id;
-            self.show_object_info = show_window;
-        }
-        if self.show_light_info {
-            let mut id = self.light_info_id;
-            let max: i32 = self.lighting_system.point_lights.len() as i32 - 1;
-            let mut show_window = self.show_light_info;
+            if self.show_camera_info {
+                Window::new(im_str!("CameraInfo"))
+                    .size([260.0, 430.0], Condition::Always)
+                    .position([20.0, 40.0], Condition::Always)
+                    .title_bar(false)
+                    .scroll_bar(false)
+                    .no_inputs()
+                    .bg_alpha(0.8)
+                    .collapsible(false)
+                    .build(&ui, || {
+                        ui.text(im_str!("Camera info"));
+                        ui.separator();
+                        <Camera as imgui_inspect::InspectRenderDefault<Camera>>::render(
+                            &[&self.camera],
+                            &"CameraInfo",
+                            ui,
+                            &imgui_inspect::InspectArgsDefault {
+                                header: Some(false),
+                                ..imgui_inspect::InspectArgsDefault::default()
+                            },
+                        );
+                    });
+            }
+            if self.show_object_info {
+                let mut id = self.object_info_id;
+                let max: i32 = self.models.len() as i32 - 1;
+                let mut show_window = self.show_object_info;
 
-            Window::new(im_str!("Lights info"))
+                Window::new(im_str!("Object info"))
+                    .size([250.0, 250.0], Condition::FirstUseEver)
+                    .opened(&mut show_window)
+                    .build(&ui, || {
+                        ui.drag_int(im_str!("id"), &mut id).min(0).max(max).build();
+
+                        let mut selected_mut = vec![&mut self.models[id as usize].transform];
+                        <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
+                            &mut selected_mut,
+                            "Object info",
+                            &ui,
+                            &InspectArgsStruct::default(),
+                        );
+                    });
+                self.object_info_id = id;
+                self.show_object_info = show_window;
+            }
+            if self.show_light_info {
+                let mut id = self.light_info_id;
+                let max: i32 = self.lighting_system.point_lights.len() as i32 - 1;
+                let mut show_window = self.show_light_info;
+
+                Window::new(im_str!("Lights info"))
                 .size([250.0, 250.0], Condition::FirstUseEver)
                 .opened(&mut show_window)
                 .build(&ui, || {
@@ -255,8 +262,10 @@ impl Client for ExampleClient {
                         );
                     }
                 });
-            self.light_info_id = id;
-            self.show_light_info = show_window;
+
+                self.light_info_id = id;
+                self.show_light_info = show_window;
+            }
         }
     }
 

@@ -11,16 +11,21 @@ lto = true
 
 [dependencies]
 gl = "0.14.0"
-imgui-glfw-rs = { git = "https://github.com/Leinnan/imgui-glfw-rs" }
+imgui-glfw-rs = { git = "https://github.com/Leinnan/imgui-glfw-rs", optional = true }
+glfw = {version="0.40.0", optional = true}
 cgmath = "0.17.0"
-imgui-inspect = "0.5.0"
-imgui-inspect-derive = "0.5.0"
+imgui-inspect = {version="0.5.0", optional = true}
+imgui-inspect-derive = {version="0.5.0", optional= true}
 tobj = "2.0.2"
-human-panic = "1.0.3"
 inline_tweak = "1.0.8"
 log = "0.4.11"
 simple-logging = "2.0.2"
 image2 = { git = "https://github.com/Leinnan/image2-rs", branch="legacy", default-features = false, features=["io"] }
+
+[features]
+default = ["no_imgui"]
+imgui_inspect = ["imgui-inspect-derive", "imgui-inspect", "imgui-glfw-rs"]
+no_imgui = ["glfw"]
 
 [profile.dev.package."*"]
 opt-level = 2

@@ -1,5 +1,8 @@
 use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::engine::Engine;
+#[cfg(feature = "no_imgui")]
+use glfw;
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
 
 pub trait Client {
@@ -10,5 +13,6 @@ pub trait Client {
     fn on_mouse_move(&mut self, x: f32, y: f32);
     // fn draw<T>(&mut self, engine: &mut Engine<T>) where T: Client;
     unsafe fn draw(&mut self);
+    #[cfg(feature = "imgui_inspect")]
     fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui);
 }

@@ -1,15 +1,19 @@
+#[cfg(feature = "imgui_inspect")]
 use crate::gaia::imgui_helper::*;
 use crate::gaia::model::Model;
 use crate::gaia::shader::Shader;
 use cgmath::{vec3, Matrix4, Rad, Vector3};
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::imgui;
+#[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
 
-#[derive(Inspect, Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "imgui_inspect", derive(Inspect))]
 pub struct Transform {
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub position: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub rotation: Vector3<f32>,
     pub scale: f32,
 }

@@ -1,18 +1,22 @@
+#[cfg(feature = "imgui_inspect")]
 use crate::gaia::imgui_helper::*;
 use crate::gaia::shader::Shader;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::imgui;
+#[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
 
-#[derive(Inspect, Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "imgui_inspect", derive(Inspect))]
 pub struct PointLight {
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub pos: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub ambient: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub diffuse: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub specular: Vector3<f32>,
     pub constant: f32,
     pub linear: f32,
@@ -79,15 +83,16 @@ impl Default for PointLight {
     }
 }
 
-#[derive(Inspect, Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "imgui_inspect", derive(Inspect))]
 pub struct DirectionalLight {
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub direction: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub ambient: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub diffuse: Vector3<f32>,
-    #[inspect(proxy_type = "CgmathVec3f32")]
+    #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
     pub specular: Vector3<f32>,
 }
 

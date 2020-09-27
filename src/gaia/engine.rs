@@ -1,25 +1,32 @@
 use crate::example_client::ExampleClient;
 use crate::gaia::assets_cache::AssetsCache;
-use crate::gaia::bg_info::BgInfo;
 use crate::gaia::camera::*;
 use crate::gaia::client::Client;
 use crate::gaia::consts;
 use crate::gaia::framebuffer::FramebufferSystem;
 use cgmath::Point3;
+#[cfg(feature = "no_imgui")]
+use glfw;
+use glfw::{Action, Context, Key};
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
-use imgui_glfw_rs::glfw::{Action, Context, Key};
+#[cfg(feature = "imgui_inspect")]
+use imgui_glfw_rs::glfw;
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::imgui;
+#[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::ImguiGLFW;
 use log::{info, trace, warn};
 
 pub struct Engine {
     pub camera: Camera,
-    pub bg_info: BgInfo,
-    pub window: imgui_glfw_rs::glfw::Window,
+    pub window: glfw::Window,
     pub window_size: (f32, f32),
-    pub events: std::sync::mpsc::Receiver<(f64, imgui_glfw_rs::glfw::WindowEvent)>,
-    pub glfw: imgui_glfw_rs::glfw::Glfw,
+    pub events: std::sync::mpsc::Receiver<(f64, glfw::WindowEvent)>,
+    pub glfw: glfw::Glfw,
+    #[cfg(feature = "imgui_inspect")]
     pub imgui: imgui::Context,
+    #[cfg(feature = "imgui_inspect")]
     pub imgui_glfw: ImguiGLFW,
     pub client: Box<dyn Client>,
     enable_debug_layer: bool,
@@ -48,8 +55,11 @@ impl Engine {
 
             // input
             // -----
+            #[cfg(feature = "imgui_inspect")]
             let skip_input =
                 self.imgui.io().want_capture_mouse || self.imgui.io().want_capture_keyboard;
+            #[cfg(feature = "no_imgui")]
+            let skip_input = false;
             if !skip_input {
                 self.process_input(delta_time);
             }
@@ -65,6 +75,7 @@ impl Engine {
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             // -------------------------------------------------------------------------------
 
+            #[cfg(feature = "imgui_inspect")]
             if self.enable_debug_layer {
                 let ui = self.imgui_glfw.frame(&mut self.window, &mut self.imgui);
                 self.client.debug_draw(&ui);
@@ -150,7 +161,9 @@ impl Engine {
         skip_input: bool,
     ) {
         for (_, event) in glfw::flush_messages(&self.events) {
+            #[cfg(feature = "imgui_inspect")]
             self.imgui_glfw.handle_event(&mut self.imgui, &event);
+
             match event {
                 glfw::WindowEvent::FramebufferSize(width, height) => {
                     // make sure the viewport matches the new window dimensions; note that width and
@@ -225,7 +238,9 @@ impl Default for Engine {
         // ---------------------------------------
         gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
+        #[cfg(feature = "imgui_inspect")]
         let mut imgui = imgui::Context::create();
+        #[cfg(feature = "imgui_inspect")]
         {
             use imgui_glfw_rs::imgui::FontSource;
             use imgui_glfw_rs::imgui::StyleColor;
@@ -290,6 +305,7 @@ impl Default for Engine {
                 config: None,
             }]);
         }
+        #[cfg(feature = "imgui_inspect")]
         let imgui_glfw = ImguiGLFW::new(&mut imgui, &mut window);
         // configure global opengl state
         // -----------------------------
@@ -301,12 +317,13 @@ impl Default for Engine {
         let fb = unsafe { FramebufferSystem::generate(scr_width, scr_height) };
 
         Engine {
-            bg_info: BgInfo::default(),
             window: window,
             window_size: (consts::SCR_WIDTH as f32, consts::SCR_HEIGHT as f32),
             events: events,
             glfw: glfw,
+            #[cfg(feature = "imgui_inspect")]
             imgui: imgui,
+            #[cfg(feature = "imgui_inspect")]
             imgui_glfw: imgui_glfw,
             framebuffer: fb,
             camera: Camera {
