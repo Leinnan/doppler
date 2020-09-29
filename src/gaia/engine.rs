@@ -57,6 +57,7 @@ impl TimeStep {
 pub struct Engine {
     title: String,
     size: (i32, i32),
+    #[cfg(feature = "imgui_inspect")]
     debug_layer: bool,
 }
 
@@ -65,6 +66,7 @@ impl Default for Engine {
         Engine {
             title: String::from("Doppler demo"),
             size: (1280, 720),
+            #[cfg(feature = "imgui_inspect")]
             debug_layer: true,
         }
     }
@@ -99,11 +101,12 @@ impl Engine {
         info!("DPI: {}", gl_window.window().scale_factor());
         let mut client = ExampleClient::create();
         let mut framebuffer = unsafe { FramebufferSystem::generate(self.size.0, self.size.1) };
-        let mut imgui = Context::create();
-        {
+        #[cfg(feature = "imgui_inspect")]
+        let (mut imgui, mut platform, renderer) = {
+            let mut imgui = Context::create();
             use imgui::{FontSource, StyleColor};
             let mut style = imgui.style_mut();
-            // style.scale_all_sizes(1.5);
+            style.scale_all_sizes(1.5);
             style[StyleColor::Text] = [1.0, 1.0, 1.0, 1.0];
             style[StyleColor::TextDisabled] = [0.5, 0.5, 0.5, 1.0];
             style[StyleColor::WindowBg] = [0.13, 0.14, 0.15, 1.0];
@@ -163,12 +166,13 @@ impl Engine {
                 config: None,
             }]);
             info!("Fonts amount int imgui: {}", imgui.fonts().fonts().len());
-        }
-        let mut platform = WinitPlatform::init(&mut imgui); // step 1
-        platform.attach_window(imgui.io_mut(), &gl_window.window(), HiDpiMode::Locked(1.0)); // step 2
-        let renderer = imgui_opengl_renderer::Renderer::new(&mut imgui, |s| {
-            gl_window.get_proc_address(s) as _
-        });
+            let mut platform = WinitPlatform::init(&mut imgui); // step 1
+            platform.attach_window(imgui.io_mut(), &gl_window.window(), HiDpiMode::Locked(1.0)); // step 2
+            let renderer = imgui_opengl_renderer::Renderer::new(&mut imgui, |s| {
+                gl_window.get_proc_address(s) as _
+            });
+            (imgui, platform, renderer)
+        };
         let mut assets_cache = AssetsCache::default();
         client.load_assets(&mut assets_cache);
         let mut first_mouse = true;
@@ -184,16 +188,21 @@ impl Engine {
         event_loop.run(move |event, _, control_flow| {
             use glutin::event_loop::ControlFlow;
             *control_flow = ControlFlow::Poll;
+            #[cfg(feature = "imgui_inspect")]
             platform.handle_event(imgui.io_mut(), &gl_window.window(), &event);
             match event {
                 Event::NewEvents(_) => {
                     // other application-specific logic
-                    last_frame = imgui.io_mut().update_delta_time(last_frame);
+                    #[cfg(feature = "imgui_inspect")]
+                    {
+                        last_frame = imgui.io_mut().update_delta_time(last_frame);
+                    }
                 }
                 Event::MainEventsCleared => {
                     let delta = timestep.delta();
                     client.update(&self, delta);
                     // other application-specific logic
+                    #[cfg(feature = "imgui_inspect")]
                     platform
                         .prepare_frame(imgui.io_mut(), &gl_window.window()) // step 4
                         .expect("Failed to prepare frame");
@@ -248,11 +257,12 @@ impl Engine {
                             FramebufferSystem::generate(size.width as i32, size.height as i32)
                         };
 
+                        #[cfg(feature = "imgui_inspect")]
                         platform.attach_window(
                             imgui.io_mut(),
                             &gl_window.window(),
                             HiDpiMode::Locked(1.0),
-                        ); // step 2
+                        );
                     }
                     _ => (),
                 },
@@ -262,6 +272,8 @@ impl Engine {
                         client.draw();
                         framebuffer.draw();
                     }
+
+                    #[cfg(feature = "imgui_inspect")]
                     if self.debug_layer {
                         imgui.io_mut().display_size = [screensize.0 as f32, screensize.1 as f32];
                         let imgui_size = imgui.io().display_size;
