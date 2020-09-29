@@ -6,14 +6,9 @@ use crate::gaia::consts;
 use crate::gaia::engine::Engine;
 use crate::gaia::light::*;
 use crate::gaia::sky::Sky;
-use crate::gaia::*;
 use cgmath::prelude::*;
-use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
-#[cfg(feature = "glfw_obsolete")]
-use glfw;
-use glutin::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
-#[cfg(feature = "glfw_obsolete")]
-use imgui_glfw_rs::glfw;
+use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
+use glutin::event::{ElementState, VirtualKeyCode};
 
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
@@ -152,7 +147,6 @@ impl Client for ExampleClient {
     }
     fn update(&mut self, _engine: &Engine, delta: f32) {
         self.delta = delta;
-        println!("{}", delta);
     }
 
     #[cfg(feature = "imgui_inspect")]

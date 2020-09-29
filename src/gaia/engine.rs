@@ -187,7 +187,6 @@ impl Engine {
         let mut screensize = self.size;
 
         event_loop.run(move |event, _, control_flow| {
-            use glutin::event::{Event, WindowEvent};
             use glutin::event_loop::ControlFlow;
             *control_flow = ControlFlow::Poll;
             platform.handle_event(imgui.io_mut(), &gl_window.window(), &event);
@@ -207,6 +206,13 @@ impl Engine {
                 }
                 Event::LoopDestroyed => return,
                 Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::MouseWheel { delta, .. } => {
+                        use glutin::event::MouseScrollDelta;
+                        match delta {
+                            MouseScrollDelta::LineDelta(x, y) => client.on_mouse_scroll(y),
+                            MouseScrollDelta::PixelDelta(pos) => client.on_mouse_scroll(pos.y as f32),
+                        }
+                    }
                     WindowEvent::CursorMoved { position, .. } => {
                         let xpos = position.x as f32;
                         let ypos = position.y as f32;
