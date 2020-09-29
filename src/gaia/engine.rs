@@ -5,12 +5,59 @@ use crate::gaia::client::Client;
 use crate::gaia::consts;
 use crate::gaia::framebuffer::FramebufferSystem;
 use cgmath::Point3;
+use glutin::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 #[cfg(feature = "imgui_inspect")]
 use imgui::Context;
 #[cfg(feature = "imgui_inspect")]
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
+use std::time::Instant;
 
 use log::{info, trace, warn};
+
+#[derive(Debug)]
+pub struct TimeStep {
+    last_time:   Instant,
+    delta_time:  f32,
+    frame_count: u32,
+    frame_time:  f32,
+}
+
+impl TimeStep {
+    pub fn new() -> TimeStep {
+        TimeStep {
+            last_time:   Instant::now(),
+            delta_time:  0.0,
+            frame_count: 0,
+            frame_time:  0.0,
+        }
+    }
+
+    pub fn delta(&mut self) -> f32 {
+        let current_time = Instant::now();
+        let delta = current_time.duration_since(self.last_time).as_micros()
+            as f32
+            * 0.001;
+        self.last_time = current_time;
+        self.delta_time = delta;
+        delta
+    }
+
+    // provides the framerate in FPS
+    pub fn frame_rate(&mut self) -> Option<u32> {
+        self.frame_count += 1;
+        self.frame_time += self.delta_time;
+        let tmp;
+        // per second
+        if self.frame_time >= 1000.0 {
+            tmp = self.frame_count;
+            self.frame_count = 0;
+            self.frame_time = 0.0;
+            return Some(tmp);
+        }
+        None
+    }
+}
+
 
 #[cfg(not(feature = "glfw_obsolete"))]
 pub struct Engine {
@@ -25,7 +72,7 @@ impl Default for Engine {
         Engine {
             title: String::from("Doppler demo"),
             size: (1280, 720),
-            debug_layer: true,
+            debug_layer: true
         }
     }
 }
@@ -55,11 +102,7 @@ impl Engine {
         // configure global opengl state
         // -----------------------------
         unsafe {
-            gl::Enable(gl::BLEND);
-            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
             gl::Enable(gl::DEPTH_TEST);
-            gl::DepthFunc(gl::LESS);
-            gl::ClearColor(0.1, 0.1, 0.1, 1.0);
         }
         info!("DPI: {}", gl_window.window().scale_factor());
         let mut client = ExampleClient::create();
@@ -141,8 +184,7 @@ impl Engine {
         let mut last_y: f32 = consts::SCR_HEIGHT as f32 / 2.0;
 
         // timing
-        let mut delta_time: f32 = 0.0; // time between current frame and last frame
-        let mut last_frame: f32 = 0.0;
+        let mut timestep = TimeStep::new();
         let mut last_frame = std::time::Instant::now();
 
         let mut screensize = self.size;
@@ -156,8 +198,11 @@ impl Engine {
                 Event::NewEvents(_) => {
                     // other application-specific logic
                     last_frame = imgui.io_mut().update_delta_time(last_frame);
+                     
                 }
                 Event::MainEventsCleared => {
+                    let delta = timestep.delta();
+                    client.update(&self,delta);
                     // other application-specific logic
                     platform
                         .prepare_frame(imgui.io_mut(), &gl_window.window()) // step 4
@@ -166,6 +211,18 @@ impl Engine {
                 }
                 Event::LoopDestroyed => return,
                 Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::KeyboardInput {
+                        input:
+                            KeyboardInput {
+                                virtual_keycode: Some(virtual_code),
+                                state,
+                                ..
+                            },
+                        ..
+                    } => match (virtual_code, state) {
+                        (VirtualKeyCode::Escape, _) => *control_flow = ControlFlow::Exit,
+                        _ => client.on_keyboard(&virtual_code, &state),
+                    },
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
                     WindowEvent::Resized(size) => {
                         info!("Resizing to {:?}", size);
@@ -195,7 +252,7 @@ impl Engine {
                         let ui = imgui.frame();
                         client.debug_draw(&ui);
                         use imgui::*;
-                        let fps = 1.0 / delta_time;
+                        let fps = timestep.frame_rate().unwrap_or(0u32);
                         let size = [250.0, 110.0];
                         let offset = 20.0;
                         Window::new(im_str!("EngineInfo"))

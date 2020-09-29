@@ -11,6 +11,7 @@ use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
 #[cfg(feature = "glfw_obsolete")]
 use glfw;
+use glutin::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 #[cfg(feature = "glfw_obsolete")]
 use imgui_glfw_rs::glfw;
 
@@ -24,12 +25,14 @@ pub struct ExampleClient {
     object_info_id: i32,
     show_light_info: bool,
     light_info_id: i32,
+    delta: f32,
 }
 
 impl ExampleClient {
     pub fn create() -> ExampleClient {
         let sky = unsafe { Sky::new() };
         ExampleClient {
+            delta: 0.0,
             models: vec![],
             camera: Camera {
                 position: Point3::new(0.0, 8.0, 13.0),
@@ -52,6 +55,27 @@ impl ExampleClient {
 }
 
 impl Client for ExampleClient {
+    fn on_keyboard(&mut self, code: &VirtualKeyCode, state: &ElementState) {
+        match (code, state) {
+            (VirtualKeyCode::W, ElementState::Pressed) => {
+                self.camera.process_keyboard(CameraMovement::FORWARD, self.delta)
+            }
+            (VirtualKeyCode::S, ElementState::Pressed) => {
+                self.camera.process_keyboard(CameraMovement::BACKWARD, self.delta)
+            }
+            (VirtualKeyCode::A, ElementState::Pressed) => {
+                self.camera.process_keyboard(CameraMovement::LEFT, self.delta)
+            }
+            (VirtualKeyCode::D, ElementState::Pressed) => {
+                self.camera.process_keyboard(CameraMovement::RIGHT, self.delta)
+            }
+            (VirtualKeyCode::LControl, _) => self
+                .camera
+                .enable_mouse_movement(state == &ElementState::Released),
+            (_, _) => (),
+        }
+    }
+
     fn load_assets(&mut self, cache: &mut AssetsCache) {
         let ground = ModelComponent {
             transform: Transform {
@@ -126,29 +150,9 @@ impl Client for ExampleClient {
         }
         self.sky.draw(view, projection);
     }
-    fn update(&mut self, _engine: &mut Engine) {}
-
-    #[cfg(feature = "glfw_obsolete")]
-    fn process_input(&mut self, window: &glfw::Window, delta: f32) {
-        use glfw::{Action, Key};
-        if window.get_key(Key::W) == Action::Press {
-            self.camera.process_keyboard(CameraMovement::FORWARD, delta);
-        }
-        if window.get_key(Key::S) == Action::Press {
-            self.camera
-                .process_keyboard(CameraMovement::BACKWARD, delta);
-        }
-        if window.get_key(Key::A) == Action::Press {
-            self.camera.process_keyboard(CameraMovement::LEFT, delta);
-        }
-        if window.get_key(Key::D) == Action::Press {
-            self.camera.process_keyboard(CameraMovement::RIGHT, delta);
-        }
-        self.camera
-            .enable_mouse_movement(window.get_key(Key::LeftControl) != Action::Press);
-        if window.get_key(Key::O) == Action::Press {
-            println!("{:?}", self.camera);
-        }
+    fn update(&mut self, _engine: &Engine, delta: f32) {
+        self.delta = delta;
+        println!("{}",delta);
     }
 
     #[cfg(feature = "imgui_inspect")]

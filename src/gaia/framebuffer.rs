@@ -53,12 +53,12 @@ impl FramebufferSystem {
             "Generating new framebuffer with dimensions {}x{}",
             scr_width, scr_height
         );
-        let screenShader = Shader::from_file(
+        let shader = Shader::from_file(
             "resources/shaders/framebuffers_screen.vs",
             "resources/shaders/framebuffers_screen.fs",
         );
 
-        let quadVertices: [f32; 24] = [
+        let quad_vert: [f32; 24] = [
             // vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
             // positions // texCoords
             -1.0, 1.0, 0.0, 1.0, -1.0, -1.0, 0.0, 0.0, 1.0, -1.0, 1.0, 0.0, -1.0, 1.0, 0.0, 1.0,
@@ -73,8 +73,8 @@ impl FramebufferSystem {
         gl::BindBuffer(gl::ARRAY_BUFFER, quad_vbo);
         gl::BufferData(
             gl::ARRAY_BUFFER,
-            (quadVertices.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
-            &quadVertices[0] as *const f32 as *const c_void,
+            (quad_vert.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
+            &quad_vert[0] as *const f32 as *const c_void,
             gl::STATIC_DRAW,
         );
         gl::EnableVertexAttribArray(0);
@@ -89,10 +89,10 @@ impl FramebufferSystem {
             stride,
             (2 * mem::size_of::<GLfloat>()) as *const c_void,
         );
-        screenShader.use_program();
-        screenShader.setInt(c_str!("screenTexture"), 0);
-        screenShader.setFloat(c_str!("screen_width"), scr_width as f32);
-        screenShader.setFloat(c_str!("screen_height"), scr_height as f32);
+        shader.use_program();
+        shader.setInt(c_str!("screenTexture"), 0);
+        shader.setFloat(c_str!("screen_width"), scr_width as f32);
+        shader.setFloat(c_str!("screen_height"), scr_height as f32);
 
         // framebuffer configuration
         // -------------------------
@@ -149,7 +149,7 @@ impl FramebufferSystem {
 
         FramebufferSystem {
             texture_color_buffer: textureColorbuffer,
-            shader: screenShader,
+            shader: shader,
             vao: quad_vao,
             vbo: quad_vbo,
             framebuffer: framebuffer,

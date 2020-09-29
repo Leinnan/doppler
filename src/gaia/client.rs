@@ -1,15 +1,11 @@
 use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::engine::Engine;
-#[cfg(feature = "glfw_obsolete")]
-use glfw;
-#[cfg(feature = "glfw_obsolete")]
-use imgui_glfw_rs::glfw;
+use glutin::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 
 pub trait Client {
     fn load_assets(&mut self, cache: &mut AssetsCache);
-    fn update(&mut self, engine: &mut Engine);
-    #[cfg(feature = "glfw_obsolete")]
-    fn process_input(&mut self, window: &glfw::Window, delta: f32);
+    fn update(&mut self, engine: &Engine, delta: f32);
+    fn on_keyboard(&mut self, code: &VirtualKeyCode, state: &ElementState);
     fn on_mouse_scroll(&mut self, yoffset: f32);
     fn on_mouse_move(&mut self, x: f32, y: f32);
     // fn draw<T>(&mut self, engine: &mut Engine<T>) where T: Client;
