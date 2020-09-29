@@ -11,7 +11,7 @@ use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
 #[cfg(feature = "glfw_obsolete")]
 use glfw;
-#[cfg(feature = "imgui_inspect")]
+#[cfg(feature = "glfw_obsolete")]
 use imgui_glfw_rs::glfw;
 
 pub struct ExampleClient {
@@ -128,8 +128,7 @@ impl Client for ExampleClient {
     }
     fn update(&mut self, _engine: &mut Engine) {}
 
-
-    #[cfg(feature="glfw_obsolete")]
+    #[cfg(feature = "glfw_obsolete")]
     fn process_input(&mut self, window: &glfw::Window, delta: f32) {
         use glfw::{Action, Key};
         if window.get_key(Key::W) == Action::Press {
@@ -153,8 +152,8 @@ impl Client for ExampleClient {
     }
 
     #[cfg(feature = "imgui_inspect")]
-    fn debug_draw(&mut self, ui: &imgui_glfw_rs::imgui::Ui) {
-        use imgui_glfw_rs::imgui::*;
+    fn debug_draw(&mut self, ui: &imgui::Ui) {
+        use imgui::*;
         if let Some(menu_bar) = ui.begin_main_menu_bar() {
             if let Some(menu) = ui.begin_menu(im_str!("Basic"), true) {
                 if MenuItem::new(im_str!("Show Object info"))

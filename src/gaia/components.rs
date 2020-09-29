@@ -4,7 +4,7 @@ use crate::gaia::model::Model;
 use crate::gaia::shader::Shader;
 use cgmath::{vec3, Matrix4, Rad, Vector3};
 #[cfg(feature = "imgui_inspect")]
-use imgui_glfw_rs::imgui;
+use imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
 

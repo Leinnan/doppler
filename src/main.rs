@@ -4,7 +4,7 @@ extern crate gl;
 extern crate glutin;
 
 #[cfg(feature = "imgui_inspect")]
-extern crate imgui_glfw_rs;
+extern crate imgui;
 extern crate log;
 extern crate simple_logging;
 

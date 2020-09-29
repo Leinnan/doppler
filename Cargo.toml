@@ -11,7 +11,10 @@ lto = true
 
 [dependencies]
 gl = "0.14.0"
-imgui-glfw-rs = { git = "https://github.com/Leinnan/imgui-glfw-rs", optional = true }
+imgui="0.4"
+imgui-winit-support = {version="0.4.0", optional=true}
+imgui-opengl-renderer = {version="0.8", optional = true}
+# imgui-glfw-rs = { git = "https://github.com/Leinnan/imgui-glfw-rs", optional = true }
 glfw = {version="0.40.0", optional = true}
 cgmath = "0.17.0"
 imgui-inspect = {version="0.5.0", optional = true}
@@ -24,8 +27,8 @@ image2 = { git = "https://github.com/Leinnan/image2-rs", branch="legacy", defaul
 glutin = "0.24.1"
 
 [features]
-default = []
-imgui_inspect = ["imgui-inspect-derive", "imgui-inspect", "imgui-glfw-rs"]
+default = ["imgui_inspect"]
+imgui_inspect = ["imgui-inspect-derive","imgui-opengl-renderer", "imgui-inspect", "imgui-winit-support"]
 glfw_obsolete = ["glfw"]
 
 [profile.dev.package."*"]

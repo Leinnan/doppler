@@ -252,9 +252,11 @@ dependencies = [
  "glfw",
  "glutin",
  "image2",
- "imgui-glfw-rs",
+ "imgui",
  "imgui-inspect",
  "imgui-inspect-derive",
+ "imgui-opengl-renderer",
+ "imgui-winit-support",
  "inline_tweak",
  "log",
  "simple-logging",
@@ -466,16 +468,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "imgui-glfw-rs"
-version = "0.4.2"
-source = "git+https://github.com/Leinnan/imgui-glfw-rs#9537c6d82f1594b22603a4e729e3943a326c54ac"
-dependencies = [
- "glfw",
- "imgui",
- "imgui-opengl-renderer",
-]
-
-[[package]]
 name = "imgui-inspect"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -514,6 +506,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72be9671d64dd0ed26bb708cd10060a431262ac90ae70cf7c5912feefe6849da"
 dependencies = [
  "cc",
+]
+
+[[package]]
+name = "imgui-winit-support"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f98171c35263e3eb0dfb66cb876e3efdb788d777c1b613c7d2592303d1276bb5"
+dependencies = [
+ "imgui",
+ "winit",
 ]
 
 [[package]]

@@ -1,5 +1,5 @@
 use cgmath::{Point3, Vector3};
-use imgui_glfw_rs::imgui;
+use imgui;
 use imgui_inspect::InspectArgsDefault;
 use imgui_inspect::InspectRenderDefault;
 

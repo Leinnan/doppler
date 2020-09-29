@@ -6,7 +6,7 @@ use cgmath;
 use cgmath::prelude::*;
 use cgmath::vec3;
 #[cfg(feature = "imgui_inspect")]
-use imgui_glfw_rs::imgui;
+use imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
 

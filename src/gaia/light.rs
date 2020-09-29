@@ -3,7 +3,7 @@ use crate::gaia::imgui_helper::*;
 use crate::gaia::shader::Shader;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
 #[cfg(feature = "imgui_inspect")]
-use imgui_glfw_rs::imgui;
+use imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
 
