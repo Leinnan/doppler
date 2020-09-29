@@ -1,4 +1,4 @@
-use crate::gaia::shader::*;
+use crate::shader::*;
 use gl::types::*;
 use log::{info, warn};
 use std::mem;

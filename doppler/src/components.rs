@@ -1,7 +1,7 @@
 #[cfg(feature = "imgui_inspect")]
-use crate::gaia::imgui_helper::*;
-use crate::gaia::model::Model;
-use crate::gaia::shader::Shader;
+use crate::imgui_helper::*;
+use crate::model::Model;
+use crate::shader::Shader;
 use cgmath::{vec3, Matrix4, Rad, Vector3};
 #[cfg(feature = "imgui_inspect")]
 use imgui;

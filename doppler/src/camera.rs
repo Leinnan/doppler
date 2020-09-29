@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 #[cfg(feature = "imgui_inspect")]
-use crate::gaia::imgui_helper::*;
+use crate::imgui_helper::*;
 use cgmath;
 use cgmath::prelude::*;
 use cgmath::vec3;

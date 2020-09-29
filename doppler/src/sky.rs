@@ -1,5 +1,5 @@
-use crate::gaia::shader::*;
-use crate::gaia::utils::*;
+use crate::shader::*;
+use crate::utils::*;
 use cgmath::Matrix4;
 use gl::types::*;
 use std::mem;

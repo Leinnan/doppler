@@ -1,9 +1,9 @@
 #![allow(non_snake_case)]
 #![allow(dead_code)]
 
-use crate::gaia::assets_cache::AssetsCache;
-use crate::gaia::mesh::{Mesh, Texture, Vertex};
-use crate::gaia::shader::Shader;
+use crate::assets_cache::AssetsCache;
+use crate::mesh::{Mesh, Texture, Vertex};
+use crate::shader::Shader;
 use cgmath::{vec2, vec3};
 use log::{info, warn};
 use std::path::Path;

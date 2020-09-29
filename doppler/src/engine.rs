@@ -1,16 +1,15 @@
-use crate::example_client::ExampleClient;
-use crate::gaia::assets_cache::AssetsCache;
-use crate::gaia::client::Client;
-use crate::gaia::consts;
-use crate::gaia::framebuffer::FramebufferSystem;
+use crate::assets_cache::AssetsCache;
+use crate::client::Client;
+use crate::consts;
+use crate::framebuffer::FramebufferSystem;
 use glutin::event::{Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 #[cfg(feature = "imgui_inspect")]
 use imgui::Context;
 #[cfg(feature = "imgui_inspect")]
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
-
 use log::info;
+use log::LevelFilter;
 
 #[derive(Debug)]
 pub struct TimeStep {
@@ -63,7 +62,7 @@ pub struct Engine {
 
 impl Default for Engine {
     fn default() -> Self {
-        Engine {
+        Self {
             title: String::from("Doppler demo"),
             size: (1280, 720),
             #[cfg(feature = "imgui_inspect")]
@@ -73,7 +72,9 @@ impl Default for Engine {
 }
 
 impl Engine {
-    pub fn run(self) {
+    pub fn run<T: Client + Default + 'static>(self) {
+        let _ = simple_logging::log_to_file("log.log", LevelFilter::Info);
+        info!("Starting engine!");
         let event_loop = glutin::event_loop::EventLoop::new();
         let window = glutin::window::WindowBuilder::new()
             .with_title(&self.title)
@@ -99,7 +100,6 @@ impl Engine {
             gl::Enable(gl::DEPTH_TEST);
         }
         info!("DPI: {}", gl_window.window().scale_factor());
-        let mut client = ExampleClient::create();
         let mut framebuffer = unsafe { FramebufferSystem::generate(self.size.0, self.size.1) };
         #[cfg(feature = "imgui_inspect")]
         let (mut imgui, mut platform, renderer) = {
@@ -161,7 +161,7 @@ impl Engine {
             style.frame_rounding = style.grab_rounding;
             imgui.fonts().clear();
             imgui.fonts().add_font(&[FontSource::TtfData {
-                data: include_bytes!("../../resources/FiraSans-SemiBold.ttf"),
+                data: include_bytes!("../resources/FiraSans-SemiBold.ttf"),
                 size_pixels: 19.0,
                 config: None,
             }]);
@@ -173,7 +173,10 @@ impl Engine {
             });
             (imgui, platform, renderer)
         };
+        info!("Creating AssetCache");
         let mut assets_cache = AssetsCache::default();
+        info!("Creating client");
+        let mut client = Box::new(T::default());
         client.load_assets(&mut assets_cache);
         let mut first_mouse = true;
         let mut last_x: f32 = consts::SCR_WIDTH as f32 / 2.0;
@@ -200,7 +203,7 @@ impl Engine {
                 }
                 Event::MainEventsCleared => {
                     let delta = timestep.delta();
-                    client.update(&self, delta);
+                    client.update(delta);
                     // other application-specific logic
                     #[cfg(feature = "imgui_inspect")]
                     platform

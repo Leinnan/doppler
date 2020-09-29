@@ -1,6 +1,6 @@
-use crate::gaia::mesh::Texture;
-use crate::gaia::model::Model;
-use crate::gaia::utils::load_texture_from_dir;
+use crate::mesh::Texture;
+use crate::model::Model;
+use crate::utils::load_texture_from_dir;
 use log::info;
 use std::collections::HashMap;
 

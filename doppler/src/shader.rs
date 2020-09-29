@@ -8,7 +8,7 @@ use std::str;
 use gl;
 use gl::types::*;
 
-use crate::gaia::consts;
+use crate::consts;
 use cgmath::prelude::*;
 use cgmath::{Matrix, Matrix4, Vector2, Vector3};
 

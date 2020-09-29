@@ -1,14 +1,14 @@
-use crate::gaia::assets_cache::AssetsCache;
-use crate::gaia::camera::*;
-use crate::gaia::client::Client;
-use crate::gaia::components::{ModelComponent, Transform};
-use crate::gaia::consts;
-use crate::gaia::engine::Engine;
-use crate::gaia::light::*;
-use crate::gaia::sky::Sky;
+use crate::doppler::assets_cache::AssetsCache;
+use crate::doppler::camera::*;
+use crate::doppler::client::Client;
+use crate::doppler::components::{ModelComponent, Transform};
+use crate::doppler::consts;
+use crate::doppler::light::*;
+use crate::doppler::sky::Sky;
 use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
 use glutin::event::{ElementState, VirtualKeyCode};
+use imgui::*;
 
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
@@ -23,8 +23,8 @@ pub struct ExampleClient {
     delta: f32,
 }
 
-impl ExampleClient {
-    pub fn create() -> ExampleClient {
+impl Default for ExampleClient {
+    fn default() -> Self {
         let sky = unsafe { Sky::new() };
         ExampleClient {
             delta: 0.0,
@@ -145,11 +145,10 @@ impl Client for ExampleClient {
         }
         self.sky.draw(view, projection);
     }
-    fn update(&mut self, _engine: &Engine, delta: f32) {
+    fn update(&mut self, delta: f32) {
         self.delta = delta;
     }
 
-    #[cfg(feature = "imgui_inspect")]
     fn debug_draw(&mut self, ui: &imgui::Ui) {
         use imgui::*;
         if let Some(menu_bar) = ui.begin_main_menu_bar() {
