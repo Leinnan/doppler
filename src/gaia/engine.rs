@@ -16,27 +16,25 @@ use log::{info, trace, warn};
 
 #[derive(Debug)]
 pub struct TimeStep {
-    last_time:   Instant,
-    delta_time:  f32,
+    last_time: Instant,
+    delta_time: f32,
     frame_count: u32,
-    frame_time:  f32,
+    frame_time: f32,
 }
 
 impl TimeStep {
     pub fn new() -> TimeStep {
         TimeStep {
-            last_time:   Instant::now(),
-            delta_time:  0.0,
+            last_time: Instant::now(),
+            delta_time: 0.0,
             frame_count: 0,
-            frame_time:  0.0,
+            frame_time: 0.0,
         }
     }
 
     pub fn delta(&mut self) -> f32 {
         let current_time = Instant::now();
-        let delta = current_time.duration_since(self.last_time).as_micros()
-            as f32
-            * 0.001;
+        let delta = current_time.duration_since(self.last_time).as_micros() as f32 * 0.001;
         self.last_time = current_time;
         self.delta_time = delta;
         delta
@@ -58,7 +56,6 @@ impl TimeStep {
     }
 }
 
-
 #[cfg(not(feature = "glfw_obsolete"))]
 pub struct Engine {
     title: String,
@@ -72,7 +69,7 @@ impl Default for Engine {
         Engine {
             title: String::from("Doppler demo"),
             size: (1280, 720),
-            debug_layer: true
+            debug_layer: true,
         }
     }
 }
@@ -198,11 +195,10 @@ impl Engine {
                 Event::NewEvents(_) => {
                     // other application-specific logic
                     last_frame = imgui.io_mut().update_delta_time(last_frame);
-                     
                 }
                 Event::MainEventsCleared => {
                     let delta = timestep.delta();
-                    client.update(&self,delta);
+                    client.update(&self, delta);
                     // other application-specific logic
                     platform
                         .prepare_frame(imgui.io_mut(), &gl_window.window()) // step 4
@@ -211,6 +207,23 @@ impl Engine {
                 }
                 Event::LoopDestroyed => return,
                 Event::WindowEvent { event, .. } => match event {
+                    WindowEvent::CursorMoved { position, .. } => {
+                        let xpos = position.x as f32;
+                        let ypos = position.y as f32;
+                        if first_mouse {
+                            last_x = xpos;
+                            last_y = ypos;
+                            first_mouse = false;
+                        }
+
+                        let xoffset = xpos - last_x;
+                        let yoffset = last_y - ypos; // reversed since y-coordinates go from bottom to top
+
+                        last_x = xpos;
+                        last_y = ypos;
+
+                        client.on_mouse_move(xoffset, yoffset);
+                    }
                     WindowEvent::KeyboardInput {
                         input:
                             KeyboardInput {

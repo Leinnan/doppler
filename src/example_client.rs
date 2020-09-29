@@ -57,18 +57,18 @@ impl ExampleClient {
 impl Client for ExampleClient {
     fn on_keyboard(&mut self, code: &VirtualKeyCode, state: &ElementState) {
         match (code, state) {
-            (VirtualKeyCode::W, ElementState::Pressed) => {
-                self.camera.process_keyboard(CameraMovement::FORWARD, self.delta)
-            }
-            (VirtualKeyCode::S, ElementState::Pressed) => {
-                self.camera.process_keyboard(CameraMovement::BACKWARD, self.delta)
-            }
-            (VirtualKeyCode::A, ElementState::Pressed) => {
-                self.camera.process_keyboard(CameraMovement::LEFT, self.delta)
-            }
-            (VirtualKeyCode::D, ElementState::Pressed) => {
-                self.camera.process_keyboard(CameraMovement::RIGHT, self.delta)
-            }
+            (VirtualKeyCode::W, ElementState::Pressed) => self
+                .camera
+                .process_keyboard(CameraMovement::FORWARD, self.delta),
+            (VirtualKeyCode::S, ElementState::Pressed) => self
+                .camera
+                .process_keyboard(CameraMovement::BACKWARD, self.delta),
+            (VirtualKeyCode::A, ElementState::Pressed) => self
+                .camera
+                .process_keyboard(CameraMovement::LEFT, self.delta),
+            (VirtualKeyCode::D, ElementState::Pressed) => self
+                .camera
+                .process_keyboard(CameraMovement::RIGHT, self.delta),
             (VirtualKeyCode::LControl, _) => self
                 .camera
                 .enable_mouse_movement(state == &ElementState::Released),
@@ -152,7 +152,7 @@ impl Client for ExampleClient {
     }
     fn update(&mut self, _engine: &Engine, delta: f32) {
         self.delta = delta;
-        println!("{}",delta);
+        println!("{}", delta);
     }
 
     #[cfg(feature = "imgui_inspect")]
