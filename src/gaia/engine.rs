@@ -5,7 +5,7 @@ use crate::gaia::client::Client;
 use crate::gaia::consts;
 use crate::gaia::framebuffer::FramebufferSystem;
 use cgmath::Point3;
-#[cfg(feature = "no_imgui")]
+#[cfg(feature = "glfw_obsolete")]
 use glfw;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
@@ -14,15 +14,95 @@ use imgui_glfw_rs::imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::ImguiGLFW;
 
-use glfw::{Action, Context, Key};
 use log::{info, trace, warn};
 
+#[cfg(not(feature="glfw_obsolete"))]
+pub struct Engine {
+    title: String,
+    size: (i32,i32),
+    debug_layer: bool,
+}
+
+#[cfg(not(feature="glfw_obsolete"))]
+impl Default for Engine {
+    fn default() -> Self {
+        Engine{
+            title: String::from("Doppler demo"),
+            size: (1280, 720),
+            debug_layer: false,
+        }
+    }
+}
+
+#[cfg(not(feature="glfw_obsolete"))]
+impl Engine {
+    pub fn run(&self) {
+        let event_loop = glutin::event_loop::EventLoop::new();
+        let window = glutin::window::WindowBuilder::new().with_title(&self.title)
+        .with_inner_size(glutin::dpi::LogicalSize::new(self.size.0 as f32, self.size.1 as f32));
+        let gl_window = glutin::ContextBuilder::new()
+            .build_windowed(window, &event_loop)
+            .unwrap();
+
+        let gl_window = unsafe { gl_window.make_current().unwrap() };
+        gl::load_with(|symbol| gl_window.get_proc_address(symbol));
+        // configure global opengl state
+        // -----------------------------
+        unsafe {
+            gl::Enable(gl::DEPTH_TEST);
+        }
+        let mut client = ExampleClient::create();
+        let mut framebuffer = unsafe { FramebufferSystem::generate(1024, 768) };
+        let mut camera = Camera {
+            position: Point3::new(0.0, 0.0, 3.0),
+            ..Camera::default()
+        };
+        let mut assets_cache = AssetsCache::default();
+        client.load_assets(&mut assets_cache);
+        let mut first_mouse = true;
+        let mut last_x: f32 = consts::SCR_WIDTH as f32 / 2.0;
+        let mut last_y: f32 = consts::SCR_HEIGHT as f32 / 2.0;
+
+        // timing
+        let mut delta_time: f32; // time between current frame and last frame
+        let mut last_frame: f32 = 0.0;
+
+        
+    event_loop.run(move |event, _, control_flow| {
+        use glutin::event::{Event, WindowEvent};
+        use glutin::event_loop::ControlFlow;
+        *control_flow = ControlFlow::Poll;
+        match event {
+            Event::LoopDestroyed => return,
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
+                WindowEvent::Resized(size) => {
+                    info!("Resizing!");
+                    unsafe { gl::Viewport(0, 0, size.width as i32, size.height as i32) }
+                    let window_size = (size.width as f32, size.height as f32);
+                    framebuffer = unsafe { FramebufferSystem::generate(size.width as i32, size.height as i32) };
+                },
+                _ => (),
+            },
+            Event::RedrawRequested(_) => {
+                unsafe {
+                    framebuffer.clear();
+                    client.draw();
+                    framebuffer.draw();
+                }
+                gl_window.swap_buffers().unwrap();
+            },
+            _ => (),
+        }
+    });
+    }
+}
+
+#[cfg(feature="glfw_obsolete")]
 pub struct Engine {
     pub camera: Camera,
-    pub window: glfw::Window,
+    pub ctx_wrapper: glutin::ContextWrapper<glutin::PossiblyCurrent, glutin::window::Window>,
     pub window_size: (f32, f32),
-    pub events: std::sync::mpsc::Receiver<(f64, glfw::WindowEvent)>,
-    pub glfw: glfw::Glfw,
     #[cfg(feature = "imgui_inspect")]
     pub imgui: imgui::Context,
     #[cfg(feature = "imgui_inspect")]
@@ -33,6 +113,7 @@ pub struct Engine {
     framebuffer: FramebufferSystem,
 }
 
+#[cfg(feature="glfw_obsolete")]
 impl Engine {
     pub fn run(&mut self) {
         self.client.load_assets(&mut self.assets_cache);
@@ -57,7 +138,7 @@ impl Engine {
             #[cfg(feature = "imgui_inspect")]
             let skip_input =
                 self.imgui.io().want_capture_mouse || self.imgui.io().want_capture_keyboard;
-            #[cfg(feature = "no_imgui")]
+            #[cfg(not(feature = "imgui_inspect"))]
             let skip_input = false;
             if !skip_input {
                 self.process_input(delta_time);
@@ -202,40 +283,41 @@ impl Engine {
     }
 }
 
+#[cfg(feature="glfw_obsolete")]
 impl Default for Engine {
     fn default() -> Self {
-        // glfw: initialize and configure
-        // ------------------------------
-        let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
-        glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
-        glfw.window_hint(glfw::WindowHint::OpenGlProfile(
-            glfw::OpenGlProfileHint::Core,
-        ));
-        #[cfg(target_os = "macos")]
-        glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
+        // // glfw: initialize and configure
+        // // ------------------------------
+        // let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
+        // glfw.window_hint(glfw::WindowHint::ContextVersion(3, 3));
+        // glfw.window_hint(glfw::WindowHint::OpenGlProfile(
+        //     glfw::OpenGlProfileHint::Core,
+        // ));
+        // #[cfg(target_os = "macos")]
+        // glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
 
         // glfw window creation
         // --------------------
-        let (mut window, events) = glfw
-            .create_window(
-                consts::SCR_WIDTH,
-                consts::SCR_HEIGHT,
-                "chRustedGL",
-                glfw::WindowMode::Windowed,
-            )
-            .expect("Failed to create GLFW window");
+        // let (mut window, events) = glfw
+        //     .create_window(
+        //         consts::SCR_WIDTH,
+        //         consts::SCR_HEIGHT,
+        //         "chRustedGL",
+        //         glfw::WindowMode::Windowed,
+        //     )
+        //     .expect("Failed to create GLFW window");
 
-        window.make_current();
-        window.set_all_polling(true);
-        window.set_framebuffer_size_polling(true);
-        window.set_cursor_pos_polling(true);
-        window.set_scroll_polling(true);
+        // window.make_current();
+        // window.set_all_polling(true);
+        // window.set_framebuffer_size_polling(true);
+        // window.set_cursor_pos_polling(true);
+        // window.set_scroll_polling(true);
 
-        // tell GLFW to capture our mouse
-        window.set_cursor_mode(glfw::CursorMode::Disabled);
-        // gl: load all OpenGL function pointers
-        // ---------------------------------------
-        gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
+        // // tell GLFW to capture our mouse
+        // window.set_cursor_mode(glfw::CursorMode::Disabled);
+        // // gl: load all OpenGL function pointers
+        // // ---------------------------------------
+        // gl::load_with(|symbol| window.get_proc_address(symbol) as *const _);
 
         #[cfg(feature = "imgui_inspect")]
         let mut imgui = imgui::Context::create();
@@ -311,15 +393,13 @@ impl Default for Engine {
         unsafe {
             gl::Enable(gl::DEPTH_TEST);
         }
-        let client = ExampleClient::create(&window);
-        let (scr_width, scr_height) = window.get_framebuffer_size();
-        let fb = unsafe { FramebufferSystem::generate(scr_width, scr_height) };
+        let client = ExampleClient::create();
+        let fb = unsafe { FramebufferSystem::generate(1024, 768) };
 
         Engine {
-            window: window,
+            ctx_wrapper: gl_window,
             window_size: (consts::SCR_WIDTH as f32, consts::SCR_HEIGHT as f32),
-            events: events,
-            glfw: glfw,
+            events: event_loop,
             #[cfg(feature = "imgui_inspect")]
             imgui: imgui,
             #[cfg(feature = "imgui_inspect")]

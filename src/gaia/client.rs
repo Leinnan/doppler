@@ -1,6 +1,6 @@
 use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::engine::Engine;
-#[cfg(feature = "no_imgui")]
+#[cfg(feature = "glfw_obsolete")]
 use glfw;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
@@ -8,6 +8,7 @@ use imgui_glfw_rs::glfw;
 pub trait Client {
     fn load_assets(&mut self, cache: &mut AssetsCache);
     fn update(&mut self, engine: &mut Engine);
+    #[cfg(feature="glfw_obsolete")]
     fn process_input(&mut self, window: &glfw::Window, delta: f32);
     fn on_mouse_scroll(&mut self, yoffset: f32);
     fn on_mouse_move(&mut self, x: f32, y: f32);

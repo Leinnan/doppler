@@ -21,11 +21,12 @@ inline_tweak = "1.0.8"
 log = "0.4.11"
 simple-logging = "2.0.2"
 image2 = { git = "https://github.com/Leinnan/image2-rs", branch="legacy", default-features = false, features=["io"] }
+glutin = "0.24.1"
 
 [features]
-default = ["imgui_inspect"]
+default = []
 imgui_inspect = ["imgui-inspect-derive", "imgui-inspect", "imgui-glfw-rs"]
-no_imgui = ["glfw"]
+glfw_obsolete = ["glfw"]
 
 [profile.dev.package."*"]
 opt-level = 2

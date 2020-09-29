@@ -9,7 +9,7 @@ use crate::gaia::sky::Sky;
 use crate::gaia::*;
 use cgmath::prelude::*;
 use cgmath::{perspective, vec3, Deg, Matrix4, Point3, Vector3};
-#[cfg(feature = "no_imgui")]
+#[cfg(feature = "glfw_obsolete")]
 use glfw;
 #[cfg(feature = "imgui_inspect")]
 use imgui_glfw_rs::glfw;
@@ -27,7 +27,7 @@ pub struct ExampleClient {
 }
 
 impl ExampleClient {
-    pub fn create(_window: &glfw::Window) -> ExampleClient {
+    pub fn create() -> ExampleClient {
         let sky = unsafe { Sky::new() };
         ExampleClient {
             models: vec![],
@@ -128,6 +128,8 @@ impl Client for ExampleClient {
     }
     fn update(&mut self, _engine: &mut Engine) {}
 
+
+    #[cfg(feature="glfw_obsolete")]
     fn process_input(&mut self, window: &glfw::Window, delta: f32) {
         use glfw::{Action, Key};
         if window.get_key(Key::W) == Action::Press {
