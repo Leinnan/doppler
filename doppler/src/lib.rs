@@ -1,14 +1,11 @@
 pub extern crate gl;
-pub extern crate glutin;
-
-#[cfg(feature = "imgui_inspect")]
 pub extern crate imgui;
 pub extern crate log;
 pub extern crate simple_logging;
 
-pub use cgmath::*;
-pub use glutin::*;
-pub use imgui::*;
+pub use cgmath as math;
+pub use glutin;
+pub use imgui_inspect;
 
 pub mod macros;
 

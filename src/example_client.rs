@@ -1,14 +1,14 @@
-use crate::doppler::assets_cache::AssetsCache;
-use crate::doppler::camera::*;
-use crate::doppler::client::Client;
-use crate::doppler::components::{ModelComponent, Transform};
-use crate::doppler::consts;
-use crate::doppler::light::*;
-use crate::doppler::sky::Sky;
-use cgmath::prelude::*;
-use cgmath::{perspective, vec3, Deg, Matrix4, Point3};
-use glutin::event::{ElementState, VirtualKeyCode};
-use imgui::*;
+use doppler::assets_cache::AssetsCache;
+use doppler::camera::*;
+use doppler::client::Client;
+use doppler::components::{ModelComponent, Transform};
+use doppler::consts;
+use doppler::light::*;
+use doppler::sky::Sky;
+use doppler::math::prelude::*;
+use doppler::math::{perspective, vec3, Deg, Matrix4, Point3};
+use doppler::glutin::event::{ElementState, VirtualKeyCode};
+use doppler::imgui::*;
 
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
@@ -149,8 +149,7 @@ impl Client for ExampleClient {
         self.delta = delta;
     }
 
-    fn debug_draw(&mut self, ui: &imgui::Ui) {
-        use imgui::*;
+    fn debug_draw(&mut self, ui: &doppler::imgui::Ui) {
         if let Some(menu_bar) = ui.begin_main_menu_bar() {
             if let Some(menu) = ui.begin_menu(im_str!("Basic"), true) {
                 if MenuItem::new(im_str!("Show Object info"))
@@ -177,7 +176,7 @@ impl Client for ExampleClient {
         }
 
         {
-            use imgui_inspect::InspectArgsStruct;
+            use doppler::imgui_inspect;
 
             if self.show_camera_info {
                 Window::new(im_str!("CameraInfo"))
@@ -218,7 +217,7 @@ impl Client for ExampleClient {
                             &mut selected_mut,
                             "Object info",
                             &ui,
-                            &InspectArgsStruct::default(),
+                            &imgui_inspect::InspectArgsStruct::default(),
                         );
                     });
                 self.object_info_id = id;
@@ -241,7 +240,7 @@ impl Client for ExampleClient {
                             &mut selected_mut,
                             "DirectionalLightInfo",
                             &ui,
-                            &InspectArgsStruct::default(),
+                            &imgui_inspect::InspectArgsStruct::default(),
                         );
                     }
                     ui.separator();
@@ -256,7 +255,7 @@ impl Client for ExampleClient {
                             &mut selected_mut,
                             "PointLightInfo",
                             &ui,
-                            &InspectArgsStruct::default(),
+                            &imgui_inspect::InspectArgsStruct::default(),
                         );
                     }
                 });

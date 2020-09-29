@@ -257,12 +257,7 @@ dependencies = [
 name = "doppler_example"
 version = "0.1.0"
 dependencies = [
- "cgmath",
  "doppler",
- "glutin",
- "imgui",
- "imgui-inspect",
- "imgui-inspect-derive",
 ]
 
 [[package]]

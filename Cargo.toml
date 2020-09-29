@@ -11,11 +11,6 @@ lto = true
 
 [dependencies]
 doppler = {path="doppler"}
-glutin = "0.24.1"
-cgmath = "0.17.0"
-imgui="0.4.0"
-imgui-inspect = "0.5.0"
-imgui-inspect-derive = "0.5.0"
 
 [profile.dev.package."*"]
 opt-level = 2
