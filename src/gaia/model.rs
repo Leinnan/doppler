@@ -4,9 +4,8 @@
 use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::mesh::{Mesh, Texture, Vertex};
 use crate::gaia::shader::Shader;
-use crate::gaia::utils::*;
 use cgmath::{vec2, vec3};
-use log::{info, trace, warn};
+use log::{info, warn};
 use std::path::Path;
 use tobj;
 

@@ -1,6 +1,6 @@
 use crate::gaia::shader::*;
 use gl::types::*;
-use log::{info, trace, warn};
+use log::{info, warn};
 use std::mem;
 use std::os::raw::c_void;
 use std::ptr;
@@ -100,9 +100,9 @@ impl FramebufferSystem {
         gl::GenFramebuffers(1, &mut framebuffer);
         gl::BindFramebuffer(gl::FRAMEBUFFER, framebuffer);
         // create a color attachment texture
-        let mut textureColorbuffer = 0;
-        gl::GenTextures(1, &mut textureColorbuffer);
-        gl::BindTexture(gl::TEXTURE_2D, textureColorbuffer);
+        let mut texture_color_buffer = 0;
+        gl::GenTextures(1, &mut texture_color_buffer);
+        gl::BindTexture(gl::TEXTURE_2D, texture_color_buffer);
         gl::TexImage2D(
             gl::TEXTURE_2D,
             0,
@@ -120,7 +120,7 @@ impl FramebufferSystem {
             gl::FRAMEBUFFER,
             gl::COLOR_ATTACHMENT0,
             gl::TEXTURE_2D,
-            textureColorbuffer,
+            texture_color_buffer,
             0,
         );
         // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
@@ -148,7 +148,7 @@ impl FramebufferSystem {
         info!("New framebuffer generated");
 
         FramebufferSystem {
-            texture_color_buffer: textureColorbuffer,
+            texture_color_buffer: texture_color_buffer,
             shader: shader,
             vao: quad_vao,
             vbo: quad_vbo,

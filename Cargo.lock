@@ -118,15 +118,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cmake"
-version = "0.1.44"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e56268c17a6248366d66d4a47a3381369d068cce8409bb1716ed77ea32163bb"
-dependencies = [
- "cc",
-]
-
-[[package]]
 name = "cocoa"
 version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -249,7 +240,6 @@ version = "0.1.0"
 dependencies = [
  "cgmath",
  "gl",
- "glfw",
  "glutin",
  "image2",
  "imgui",
@@ -341,30 +331,6 @@ dependencies = [
  "khronos_api 3.1.0",
  "log",
  "xml-rs 0.8.3",
-]
-
-[[package]]
-name = "glfw"
-version = "0.40.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "985f851b0d032911e199f308689d25c71f79d12c44625c3a31b683ad4e4f5dd9"
-dependencies = [
- "bitflags",
- "glfw-sys",
- "log",
- "objc",
- "raw-window-handle",
- "semver",
- "winapi 0.3.9",
-]
-
-[[package]]
-name = "glfw-sys"
-version = "3.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b567b13b593ec58ea912b2658ee6230ffe20a069fa5b771800acc69bb3a157e"
-dependencies = [
- "cmake",
 ]
 
 [[package]]
@@ -1131,21 +1097,6 @@ name = "scopeguard"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
-
-[[package]]
-name = "semver"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
-dependencies = [
- "semver-parser",
-]
-
-[[package]]
-name = "semver-parser"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 
 [[package]]
 name = "serde"

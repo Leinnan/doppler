@@ -1,6 +1,6 @@
 use crate::gaia::assets_cache::AssetsCache;
 use crate::gaia::engine::Engine;
-use glutin::event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent};
+use glutin::event::{ElementState, VirtualKeyCode};
 
 pub trait Client {
     fn load_assets(&mut self, cache: &mut AssetsCache);

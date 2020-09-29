@@ -1,9 +1,8 @@
 use crate::gaia::mesh::Texture;
 use crate::gaia::model::Model;
 use crate::gaia::utils::load_texture_from_dir;
-use log::{info, trace, warn};
+use log::info;
 use std::collections::HashMap;
-use std::path::Path;
 
 #[derive(Default)]
 pub struct AssetsCache {
