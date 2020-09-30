@@ -17,6 +17,7 @@ pub struct TimeStep {
     delta_time: f32,
     frame_count: u32,
     frame_time: f32,
+    last_frame_count: u32,
 }
 
 impl TimeStep {
@@ -26,30 +27,35 @@ impl TimeStep {
             delta_time: 0.0,
             frame_count: 0,
             frame_time: 0.0,
+            last_frame_count: 42,
         }
     }
 
-    pub fn delta(&mut self) -> f32 {
+    pub fn update(&mut self) {
+        // delta
         let current_time = Instant::now();
         let delta = current_time.duration_since(self.last_time).as_micros() as f32 * 0.001;
         self.last_time = current_time;
         self.delta_time = delta;
-        delta
+
+        // frame counter
+        self.frame_count += 1;
+        self.frame_time += self.delta_time;
+        // per second
+        if self.frame_time >= 1000.0 {
+            self.last_frame_count = self.frame_count;
+            self.frame_count = 0;
+            self.frame_time = 0.0;
+        }
+    }
+
+    pub fn delta(&self) -> f32 {
+        self.delta_time
     }
 
     // provides the framerate in FPS
-    pub fn frame_rate(&mut self) -> Option<u32> {
-        self.frame_count += 1;
-        self.frame_time += self.delta_time;
-        let tmp;
-        // per second
-        if self.frame_time >= 1000.0 {
-            tmp = self.frame_count;
-            self.frame_count = 0;
-            self.frame_time = 0.0;
-            return Some(tmp);
-        }
-        None
+    pub fn frame_rate(&self) -> u32 {
+        self.last_frame_count
     }
 }
 
@@ -202,8 +208,8 @@ impl Engine {
                     }
                 }
                 Event::MainEventsCleared => {
-                    let delta = timestep.delta();
-                    client.update(delta);
+                    timestep.update();
+                    client.update(timestep.delta());
                     // other application-specific logic
                     #[cfg(feature = "imgui_inspect")]
                     platform
@@ -283,7 +289,7 @@ impl Engine {
                         let ui = imgui.frame();
                         client.debug_draw(&ui);
                         use imgui::*;
-                        let fps = timestep.frame_rate().unwrap_or(0u32);
+                        let fps = timestep.frame_rate();
                         let size = [250.0, 110.0];
                         let offset = 20.0;
                         Window::new(im_str!("EngineInfo"))
