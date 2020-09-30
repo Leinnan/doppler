@@ -3,12 +3,12 @@ use doppler::camera::*;
 use doppler::client::Client;
 use doppler::components::{ModelComponent, Transform};
 use doppler::consts;
-use doppler::light::*;
-use doppler::sky::Sky;
-use doppler::math::prelude::*;
-use doppler::math::{perspective, vec3, Deg, Matrix4, Point3};
 use doppler::glutin::event::{ElementState, VirtualKeyCode};
 use doppler::imgui::*;
+use doppler::light::*;
+use doppler::math::prelude::*;
+use doppler::math::{perspective, vec3, Deg, Matrix4, Point3};
+use doppler::sky::Sky;
 
 pub struct ExampleClient {
     models: Vec<ModelComponent>,
