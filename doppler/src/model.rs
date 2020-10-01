@@ -31,7 +31,13 @@ impl Model {
                 .unwrap()
                 .into(),
         };
-        model.load_model(path, diff_texture, cache);
+
+        if pathObj.exists() {
+            model.load_model(path, diff_texture, cache);
+        } else { 
+            warn!("{} does not exist, returning empty model", path);
+        }
+        
         model
     }
 
