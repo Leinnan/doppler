@@ -10,6 +10,7 @@ use imgui_winit_support::{HiDpiMode, WinitPlatform};
 use std::time::Instant;
 use log::info;
 use log::LevelFilter;
+use std::collections::VecDeque;
 
 #[derive(Debug)]
 pub struct TimeStep {
@@ -18,9 +19,13 @@ pub struct TimeStep {
     frame_count: u32,
     frame_time: f32,
     last_frame_count: u32,
+    frames: VecDeque<f32>,
 }
 
 impl TimeStep {
+    pub fn frames(&self) -> Vec<f32> {
+        self.frames.clone().into()
+    }
     pub fn new() -> TimeStep {
         TimeStep {
             last_time: Instant::now(),
@@ -28,6 +33,7 @@ impl TimeStep {
             frame_count: 0,
             frame_time: 0.0,
             last_frame_count: 42,
+            frames: VecDeque::with_capacity(consts::FRAMES_STORED),
         }
     }
 
@@ -44,8 +50,12 @@ impl TimeStep {
         // per second
         if self.frame_time >= 1000.0 {
             self.last_frame_count = self.frame_count;
+            self.frames.push_back(self.frame_count as f32);
             self.frame_count = 0;
             self.frame_time = 0.0;
+            if self.frames.len() > consts::FRAMES_STORED {
+                let _ = self.frames.pop_front();
+            }
         }
     }
 
@@ -284,6 +294,8 @@ impl Engine {
 
                     #[cfg(feature = "imgui_inspect")]
                     if self.debug_layer {
+                        
+                        let frames_vec = timestep.frames();
                         imgui.io_mut().display_size = [screensize.0 as f32, screensize.1 as f32];
                         let imgui_size = imgui.io().display_size;
                         let ui = imgui.frame();
@@ -306,8 +318,8 @@ impl Engine {
                             .bg_alpha(0.8)
                             .save_settings(false)
                             .build(&ui, || {
-                                ui.text("Welcome in doppler world!");
-                                ui.text(format!("FPS: {:.0}", fps));
+                                ui.plot_histogram(im_str!("FPS"), &frames_vec).scale_min(0.0).build();
+                                ui.text(format!("Current FPS: {:.0}", fps));
                                 ui.separator();
                                 ui.text(format!("Mouse position: ({:4.1},{:4.1})", last_x, last_y));
                             });

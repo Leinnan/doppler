@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 // settings
+pub const FRAMES_STORED : usize = 30;
 pub const SCR_WIDTH: u32 = 1280;
 pub const SCR_HEIGHT: u32 = 720;
 

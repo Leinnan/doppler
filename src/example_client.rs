@@ -15,12 +15,12 @@ pub struct ExampleClient {
     camera: Camera,
     lighting_system: LightingSystem,
     sky: Sky,
+    delta: f32,
     show_object_info: bool,
     show_camera_info: bool,
     object_info_id: i32,
     show_light_info: bool,
     light_info_id: i32,
-    delta: f32,
 }
 
 impl Default for ExampleClient {
