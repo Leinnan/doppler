@@ -89,6 +89,7 @@ impl Default for Engine {
 
 impl Engine {
     pub fn run<T: Client + Default + 'static>(self) {
+        use crate::utils;
         let _ = simple_logging::log_to_file("log.log", LevelFilter::Info);
         info!("Starting engine!");
         let event_loop = glutin::event_loop::EventLoop::new();
@@ -99,11 +100,24 @@ impl Engine {
                 self.size.1 as f32,
             ))
             .with_resizable(true);
+
         let gl_window = glutin::ContextBuilder::new()
             .build_windowed(window, &event_loop)
             .unwrap();
 
         let gl_window = unsafe { gl_window.make_current().unwrap() };
+
+        if utils::path_exists(std::path::Path::new("resources/icon.png")) {
+            use image2::image::Image;
+            use image2::{io, ImagePtr, Rgba};
+            let img: ImagePtr<u8, Rgba> = io::read_u8(std::path::Path::new("resources/icon.png")).unwrap();
+            let img_data = img.data().to_vec();
+            let (x, y, _) = img.shape();
+            let icon = glutin::window::Icon::from_rgba(img_data, x as u32, y as u32);
+            if icon.is_ok() {
+                gl_window.window().set_window_icon(Some(icon.unwrap()));
+            }
+        }
         info!(
             "Pixel format of the window's GL context: {:?}",
             gl_window.get_pixel_format()
@@ -181,7 +195,6 @@ impl Engine {
                 size_pixels: 19.0,
                 config: None,
             }]);
-            info!("Fonts amount int imgui: {}", imgui.fonts().fonts().len());
             let mut platform = WinitPlatform::init(&mut imgui); // step 1
             platform.attach_window(imgui.io_mut(), &gl_window.window(), HiDpiMode::Locked(1.0)); // step 2
             let renderer = imgui_opengl_renderer::Renderer::new(&mut imgui, |s| {

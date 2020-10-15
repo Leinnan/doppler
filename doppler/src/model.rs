@@ -81,7 +81,7 @@ impl Model {
                 vertices.push(Vertex {
                     position: vec3(p[i * 3], p[i * 3 + 1], p[i * 3 + 2]),
                     normal: vec3(n[i * 3], n[i * 3 + 1], n[i * 3 + 2]),
-                    text_coords: vec2(t[i * 2], t[i * 2 + 1]),
+                    text_coords: vec2(t[i * 2], 1.0 - t[i * 2 + 1]),
                     ..Vertex::default()
                 })
             }

@@ -9,8 +9,8 @@ opt-level = 'z'
 panic = 'abort'
 lto = true
 
-[dependencies]
-doppler = {path="doppler"}
-
 [profile.dev.package."*"]
 opt-level = 2
+
+[dependencies]
+doppler = {path="doppler"}
