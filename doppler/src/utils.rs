@@ -1,8 +1,13 @@
 use gl;
 use image2::image::Image;
 use image2::{io, ImagePtr, Rgb, Rgba};
-use log::info;
+use log::{info,error};
 use std::os::raw::c_void;
+
+pub fn path_exists(path: &std::path::Path) -> bool {
+    let meta = std::fs::metadata(path);
+    meta.is_ok()
+}
 
 pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
     info!("Loading texture: {}", path);
@@ -75,6 +80,9 @@ pub unsafe fn load_cubemap(faces: &[&str]) -> u32 {
     gl::BindTexture(gl::TEXTURE_CUBE_MAP, texture_id);
 
     for (i, face) in faces.iter().enumerate() {
+        if !path_exists(std::path::Path::new(&face)) {
+            error!("There is no file {}", face);
+        }
         let (data, dim) = {
             let img: ImagePtr<u8, Rgb> = io::read_u8(face).unwrap();
             let img_data = img.data().to_vec();
