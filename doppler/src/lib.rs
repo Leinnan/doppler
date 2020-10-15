@@ -3,6 +3,7 @@ pub extern crate imgui;
 pub extern crate log;
 pub extern crate simple_logging;
 
+pub use serde;
 pub use cgmath as math;
 pub use glutin;
 pub use imgui_inspect;

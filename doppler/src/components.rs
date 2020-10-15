@@ -7,8 +7,9 @@ use cgmath::{vec3, Matrix4, Rad, Vector3};
 use imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Deserialize, Serialize,Clone, Copy, Debug)]
 #[cfg_attr(feature = "imgui_inspect", derive(Inspect))]
 pub struct Transform {
     #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
