@@ -9,7 +9,7 @@ use log::{info, warn};
 use std::path::Path;
 use tobj;
 
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct Model {
     /*  Model Data */
     pub meshes: Vec<Mesh>,

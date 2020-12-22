@@ -102,6 +102,7 @@ impl Engine {
             .with_resizable(true);
 
         let gl_window = glutin::ContextBuilder::new()
+            .with_gl_profile(glutin::GlProfile::Core)
             .build_windowed(window, &event_loop)
             .unwrap();
 
@@ -227,7 +228,9 @@ impl Engine {
                     // other application-specific logic
                     #[cfg(feature = "imgui_inspect")]
                     {
-                        last_frame = imgui.io_mut().update_delta_time(last_frame);
+                        let now = Instant::now();
+                        imgui.io_mut().update_delta_time(now - last_frame);
+                        last_frame = now;
                     }
                 }
                 Event::MainEventsCleared => {

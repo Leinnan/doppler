@@ -31,7 +31,7 @@ impl InspectRenderDefault<Vector3<f32>> for CgmathVec3f32 {
         let mut change = false;
         for el in data.iter_mut() {
             let mut array: [f32; 3] = [el.x, el.y, el.z];
-            change |= ui.drag_float3(&label_im, &mut array).build();
+            change |= ui.input_float3(&label_im, &mut array).build();
             el.x = array[0];
             el.y = array[1];
             el.z = array[2];
@@ -66,7 +66,7 @@ impl InspectRenderDefault<Point3<f32>> for CgmathPoint3f32 {
         let mut change = false;
         for el in data.iter_mut() {
             let mut array: [f32; 3] = [el.x, el.y, el.z];
-            change |= ui.drag_float3(&label_im, &mut array).build();
+            change |= ui.input_float3(&label_im, &mut array).build();
             el.x = array[0];
             el.y = array[1];
             el.z = array[2];

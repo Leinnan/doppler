@@ -210,7 +210,8 @@ impl Client for ExampleClient {
                     .size([250.0, 250.0], Condition::FirstUseEver)
                     .opened(&mut show_window)
                     .build(&ui, || {
-                        ui.drag_int(im_str!("id"), &mut id).min(0).max(max).build();
+                        ui.input_int(im_str!("id"), &mut id).build();
+                        id = if id < 0 { 0 } else if id > max { max } else { id };
 
                         let mut selected_mut = vec![&mut self.models[id as usize].transform];
                         <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
@@ -244,10 +245,9 @@ impl Client for ExampleClient {
                         );
                     }
                     ui.separator();
-                    ui.drag_int(im_str!("Light ID"), &mut id)
-                        .min(0)
-                        .max(max)
+                    ui.input_int(im_str!("Light ID"), &mut id)
                         .build();
+                    id = if id < 0 { 0 } else if id > max { max } else { id };
                     {
                         let mut selected_mut =
                             vec![&mut self.lighting_system.point_lights[id as usize]];
