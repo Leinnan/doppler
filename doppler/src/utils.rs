@@ -82,6 +82,8 @@ pub unsafe fn load_cubemap(faces: &[&str]) -> u32 {
     for (i, face) in faces.iter().enumerate() {
         if !path_exists(std::path::Path::new(&face)) {
             error!("There is no file {}", face);
+        } else {
+            info!("Loading {}", face);
         }
         let (data, dim) = {
             let img: ImagePtr<u8, Rgb> = io::read_u8(face).unwrap();
