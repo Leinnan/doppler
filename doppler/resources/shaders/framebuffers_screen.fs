@@ -23,6 +23,7 @@ void main()
     vec2 coord = vec2(dx*floor(TexCoords.x/dx), dy*floor(TexCoords.y/dy));
 
     vec3 tc = texture(screenTexture, coord).rgb;
-    
-    FragColor = vec4(tc,1.0) * vig;
+
+    float gamma = 2.2;
+    FragColor = vec4(pow(tc, vec3(1.0/gamma)),1.0) * vig;
 }

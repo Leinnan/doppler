@@ -73,7 +73,7 @@ impl Default for PointLight {
     fn default() -> Self {
         PointLight {
             pos: vec3(0.0, 0.0, 0.0),
-            ambient: vec3(0.05, 0.05, 0.05),
+            ambient: vec3(0.00, 0.00, 0.00),
             diffuse: vec3(0.8, 0.8, 0.8),
             specular: vec3(1.0, 1.0, 1.0),
             constant: 1.0,
@@ -100,7 +100,7 @@ impl Default for DirectionalLight {
     fn default() -> Self {
         DirectionalLight {
             direction: vec3(-0.3, -1.0, -0.3),
-            ambient: vec3(0.14, 0.14, 0.14),
+            ambient: vec3(0.05, 0.05, 0.05),
             diffuse: vec3(0.4, 0.4, 0.4),
             specular: vec3(0.5, 0.5, 0.5),
         }
