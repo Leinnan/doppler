@@ -16,7 +16,7 @@ use crate::shader::Shader;
 // Depending on how you pass the data to OpenGL, this may be bad. In this case it's not strictly
 // necessary though because of the `offset!` macro used below in setupMesh()
 #[repr(C)]
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Vertex {
     // position
     pub position: Vector3<f32>,
@@ -42,7 +42,7 @@ impl Default for Vertex {
     }
 }
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Texture {
     pub id: u32,
     pub type_: String,
@@ -57,7 +57,7 @@ impl Drop for Texture {
     }
 }
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Mesh {
     /*  Mesh Data  */
     pub vertices: Vec<Vertex>,
@@ -129,7 +129,7 @@ impl Mesh {
             // now set the sampler to the correct texture unit
             let sampler = CString::new(format!("{}{}", name, number)).unwrap();
             gl::Uniform1i(
-                gl::GetUniformLocation(shader.ID, sampler.as_ptr()),
+                gl::GetUniformLocation(shader.id, sampler.as_ptr()),
                 i as i32,
             );
             // and finally bind the texture

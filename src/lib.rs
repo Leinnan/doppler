@@ -3,10 +3,10 @@ pub extern crate imgui;
 pub extern crate log;
 pub extern crate simple_logging;
 
-pub use serde;
 pub use cgmath as math;
 pub use glutin;
 pub use imgui_inspect;
+pub use serde;
 
 pub mod macros;
 
@@ -20,9 +20,9 @@ pub mod framebuffer;
 #[cfg(feature = "imgui_inspect")]
 pub mod imgui_helper;
 pub mod light;
+pub mod map;
 pub mod mesh;
 pub mod model;
 pub mod shader;
 pub mod sky;
 pub mod utils;
-pub mod map;

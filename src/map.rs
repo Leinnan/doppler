@@ -1,14 +1,12 @@
 use crate::assets_cache::AssetsCache;
-use crate::model::Model;
-use crate::components::*;
-use crate::shader::Shader;
-use crate::sky::Sky;
-use crate::light::*;
-use crate::consts;
 use crate::camera::*;
-use serde::{Deserialize, Serialize};
+use crate::components::*;
+use crate::consts;
+use crate::light::*;
 use crate::math::{perspective, vec3, Deg, Matrix4, Point3};
-use log::{info,error};
+use crate::sky::Sky;
+use log::{error, info};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MapObject {
@@ -19,28 +17,28 @@ pub struct MapObject {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MapSave {
     pub objects: Vec<MapObject>,
-    pub camera: Camera
+    pub camera: Camera,
 }
 
 impl MapSave {
     pub fn save(map: &Map, _path: &str) {
         let mut objects = Vec::with_capacity(map.models.len());
         for m in &map.models {
-            objects.push(MapObject{
+            objects.push(MapObject {
                 model_hash: m.hash,
-                transform: m.transform
+                transform: m.transform,
             });
         }
         let ms = MapSave {
             camera: map.camera.clone(),
-            objects: objects
+            objects: objects,
         };
         match serde_yaml::to_string(&ms) {
-            Ok(result) => 
-            println!("{}", result),
-            Err(e) => println!("{:?}", e)
+            Ok(result) => println!("{}", result),
+            Err(e) => println!("{:?}", e),
         }
     }
+
     pub fn load(path: &str, cache: &mut AssetsCache) -> Map {
         let mut map = Map::default();
         info!("Loading map from file: {}", path);
@@ -48,14 +46,14 @@ impl MapSave {
         use std::fs;
         let savefile = fs::read_to_string(path);
         if savefile.is_err() {
-            error!("Cannot read file {}: {:?}",path, savefile);
+            error!("Cannot read file {}: {:?}", path, savefile);
             return map;
         }
 
-        let save : Result<MapSave, serde_yaml::Error> = serde_yaml::from_str(&savefile.unwrap());
+        let save: Result<MapSave, serde_yaml::Error> = serde_yaml::from_str(&savefile.unwrap());
 
         if save.is_err() {
-            error!("Cannot parse file {}: {:?}",path, save);
+            error!("Cannot parse file {}: {:?}", path, save);
             return map;
         }
 

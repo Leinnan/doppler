@@ -1,15 +1,11 @@
 use doppler::assets_cache::AssetsCache;
 use doppler::camera::*;
 use doppler::client::Client;
-use doppler::components::{ModelComponent, Transform};
-use doppler::consts;
+use doppler::components::Transform;
 use doppler::glutin::event::{ElementState, VirtualKeyCode};
 use doppler::imgui::*;
 use doppler::light::*;
 use doppler::map::*;
-use doppler::math::prelude::*;
-use doppler::math::{perspective, vec3, Deg, Matrix4, Point3};
-use doppler::sky::Sky;
 
 pub struct ExampleClient {
     map: Map,
@@ -65,7 +61,6 @@ impl Client for ExampleClient {
     fn load_assets(&mut self, cache: &mut AssetsCache) {
         cache.load_all_from_file("resources/test_objects.txt");
         self.map = MapSave::load("resources/test_map.yaml", cache);
-        MapSave::save(&self.map, "test");
     }
 
     unsafe fn draw(&mut self) {
@@ -102,8 +97,6 @@ impl Client for ExampleClient {
         }
 
         {
-            use doppler::imgui_inspect;
-
             if self.show_camera_info {
                 Window::new(im_str!("CameraInfo"))
                     .size([260.0, 430.0], Condition::Always)
@@ -204,4 +197,8 @@ impl Client for ExampleClient {
     fn on_mouse_move(&mut self, x: f32, y: f32) {
         self.map.camera.process_mouse_movement(x, y, true);
     }
+}
+
+pub fn main() {
+    doppler::engine::Engine::default().run::<ExampleClient>();
 }

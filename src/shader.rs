@@ -14,13 +14,13 @@ use cgmath::{Matrix, Matrix4, Vector2, Vector3};
 
 #[derive(Debug)]
 pub struct Shader {
-    pub ID: u32,
+    pub id: u32,
 }
 
 impl Drop for Shader {
     fn drop(&mut self) {
         unsafe {
-            gl::DeleteShader(self.ID);
+            gl::DeleteShader(self.id);
         }
     }
 }
@@ -39,7 +39,7 @@ impl Default for Shader {
 #[allow(dead_code)]
 impl Shader {
     pub fn new(vShaderCode: CString, fShaderCode: CString) -> Shader {
-        let mut shader = Shader { ID: 0 };
+        let mut shader = Shader { id: 0 };
 
         // 2. compile shaders
         unsafe {
@@ -62,7 +62,7 @@ impl Shader {
             // delete the shaders as they're linked into our program now and no longer necessary
             gl::DeleteShader(vertex);
             gl::DeleteShader(fragment);
-            shader.ID = ID;
+            shader.id = ID;
         }
 
         shader
@@ -92,45 +92,45 @@ impl Shader {
     /// activate the shader
     /// ------------------------------------------------------------------------
     pub unsafe fn use_program(&self) {
-        gl::UseProgram(self.ID)
+        gl::UseProgram(self.id)
     }
 
     /// utility uniform functions
     /// ------------------------------------------------------------------------
     pub unsafe fn setBool(&self, name: &CStr, value: bool) {
-        gl::Uniform1i(gl::GetUniformLocation(self.ID, name.as_ptr()), value as i32);
+        gl::Uniform1i(gl::GetUniformLocation(self.id, name.as_ptr()), value as i32);
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn setInt(&self, name: &CStr, value: i32) {
-        gl::Uniform1i(gl::GetUniformLocation(self.ID, name.as_ptr()), value);
+        gl::Uniform1i(gl::GetUniformLocation(self.id, name.as_ptr()), value);
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn setFloat(&self, name: &CStr, value: f32) {
-        gl::Uniform1f(gl::GetUniformLocation(self.ID, name.as_ptr()), value);
+        gl::Uniform1f(gl::GetUniformLocation(self.id, name.as_ptr()), value);
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn set_vector3(&self, name: &CStr, value: &Vector3<f32>) {
         gl::Uniform3fv(
-            gl::GetUniformLocation(self.ID, name.as_ptr()),
+            gl::GetUniformLocation(self.id, name.as_ptr()),
             1,
             value.as_ptr(),
         );
     }
     pub unsafe fn set_vector2(&self, name: &CStr, value: &Vector2<f32>) {
         gl::Uniform2fv(
-            gl::GetUniformLocation(self.ID, name.as_ptr()),
+            gl::GetUniformLocation(self.id, name.as_ptr()),
             1,
             value.as_ptr(),
         );
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn set_vec3(&self, name: &CStr, x: f32, y: f32, z: f32) {
-        gl::Uniform3f(gl::GetUniformLocation(self.ID, name.as_ptr()), x, y, z);
+        gl::Uniform3f(gl::GetUniformLocation(self.id, name.as_ptr()), x, y, z);
     }
     /// ------------------------------------------------------------------------
     pub unsafe fn set_mat4(&self, name: &CStr, mat: &Matrix4<f32>) {
         gl::UniformMatrix4fv(
-            gl::GetUniformLocation(self.ID, name.as_ptr()),
+            gl::GetUniformLocation(self.id, name.as_ptr()),
             1,
             gl::FALSE,
             mat.as_ptr(),
@@ -180,7 +180,7 @@ impl Shader {
 
     /// Only used in 4.9 Geometry shaders - ignore until then (shader.h in original C++)
     pub fn with_geometry_shader(vertexPath: &str, fragmentPath: &str, geometryPath: &str) -> Self {
-        let mut shader = Shader { ID: 0 };
+        let mut shader = Shader { id: 0 };
         // 1. retrieve the vertex/fragment source code from filesystem
         let mut vShaderFile =
             File::open(vertexPath).unwrap_or_else(|_| panic!("Failed to open {}", vertexPath));
@@ -234,7 +234,7 @@ impl Shader {
             gl::DeleteShader(vertex);
             gl::DeleteShader(fragment);
             gl::DeleteShader(geometry);
-            shader.ID = ID;
+            shader.id = ID;
         }
 
         shader

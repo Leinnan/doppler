@@ -3,13 +3,13 @@
 #[cfg(feature = "imgui_inspect")]
 use crate::imgui_helper::*;
 use cgmath;
-use serde::{Deserialize, Serialize};
 use cgmath::prelude::*;
 use cgmath::vec3;
 #[cfg(feature = "imgui_inspect")]
 use imgui;
 #[cfg(feature = "imgui_inspect")]
 use imgui_inspect_derive::Inspect;
+use serde::{Deserialize, Serialize};
 
 type Point3 = cgmath::Point3<f32>;
 type Vector3 = cgmath::Vector3<f32>;

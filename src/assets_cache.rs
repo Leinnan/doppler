@@ -1,15 +1,15 @@
 use crate::mesh::Texture;
 use crate::model::Model;
 use crate::utils::load_texture_from_dir;
-use log::{info, error};
+use log::{error, info};
+use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
-use std::collections::hash_map::DefaultHasher;
 
 #[derive(Default)]
 pub struct AssetsCache {
     textures: HashMap<u64, Texture>,
-    models: HashMap<u64, Model>
+    models: HashMap<u64, Model>,
 }
 
 impl AssetsCache {
@@ -55,7 +55,7 @@ impl AssetsCache {
             Some(model) => model.clone(),
             None => {
                 self.load_model_ext(path, diff_texture);
-                self.get_model_ext(path,diff_texture)
+                self.get_model_ext(path, diff_texture)
             }
         }
     }
@@ -63,7 +63,7 @@ impl AssetsCache {
     pub fn get_model_by_hash(&mut self, hash: &u64) -> Option<Model> {
         match self.models.get(hash) {
             Some(model) => Some(model.clone()),
-            None => None
+            None => None,
         }
     }
 

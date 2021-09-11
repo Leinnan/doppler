@@ -1,7 +1,7 @@
 use gl;
 use image2::image::Image;
 use image2::{io, ImagePtr, Rgb, Rgba};
-use log::{info,error};
+use log::{error, info};
 use std::os::raw::c_void;
 
 pub fn path_exists(path: &std::path::Path) -> bool {
@@ -16,7 +16,7 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
     gl::GenTextures(1, &mut id);
     let content = io::read_u8(path);
     if content.is_err() {
-        error!("Error: {:?}",content.err());
+        error!("Error: {:?}", content.err());
         panic!();
     }
     let (data, dim, format) = match file_format {

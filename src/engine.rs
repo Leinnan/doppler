@@ -7,10 +7,10 @@ use glutin::event::{Event, KeyboardInput, VirtualKeyCode, WindowEvent};
 use imgui::Context;
 #[cfg(feature = "imgui_inspect")]
 use imgui_winit_support::{HiDpiMode, WinitPlatform};
-use std::time::Instant;
 use log::info;
 use log::LevelFilter;
 use std::collections::VecDeque;
+use std::time::Instant;
 
 #[derive(Debug)]
 pub struct TimeStep {
@@ -111,7 +111,8 @@ impl Engine {
         if utils::path_exists(std::path::Path::new("resources/icon.png")) {
             use image2::image::Image;
             use image2::{io, ImagePtr, Rgba};
-            let img: ImagePtr<u8, Rgba> = io::read_u8(std::path::Path::new("resources/icon.png")).unwrap();
+            let img: ImagePtr<u8, Rgba> =
+                io::read_u8(std::path::Path::new("resources/icon.png")).unwrap();
             let img_data = img.data().to_vec();
             let (x, y, _) = img.shape();
             let icon = glutin::window::Icon::from_rgba(img_data, x as u32, y as u32);
@@ -334,7 +335,9 @@ impl Engine {
                             .bg_alpha(0.8)
                             .save_settings(false)
                             .build(&ui, || {
-                                ui.plot_histogram(im_str!("FPS"), &frames_vec).scale_min(0.0).build();
+                                ui.plot_histogram(im_str!("FPS"), &frames_vec)
+                                    .scale_min(0.0)
+                                    .build();
                                 ui.text(format!("Current FPS: {:.0}", fps));
                                 ui.separator();
                                 ui.text(format!("Mouse position: ({:4.1},{:4.1})", last_x, last_y));

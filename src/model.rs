@@ -9,7 +9,7 @@ use log::{info, warn};
 use std::path::Path;
 use tobj;
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct Model {
     /*  Model Data */
     pub meshes: Vec<Mesh>,
@@ -19,7 +19,11 @@ pub struct Model {
 
 impl Default for Model {
     fn default() -> Self {
-        Model { meshes: Vec::new(), textures_loaded: Vec::new(), directory: "".to_string() }
+        Model {
+            meshes: Vec::new(),
+            textures_loaded: Vec::new(),
+            directory: "".to_string(),
+        }
     }
 }
 

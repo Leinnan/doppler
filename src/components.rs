@@ -9,7 +9,7 @@ use imgui;
 use imgui_inspect_derive::Inspect;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize,Clone, Copy, Debug)]
+#[derive(Deserialize, Serialize, Clone, Copy, Debug)]
 #[cfg_attr(feature = "imgui_inspect", derive(Inspect))]
 pub struct Transform {
     #[cfg_attr(feature = "imgui_inspect", inspect(proxy_type = "CgmathVec3f32"))]
