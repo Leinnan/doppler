@@ -211,7 +211,13 @@ impl Client for ExampleClient {
                     .opened(&mut show_window)
                     .build(&ui, || {
                         ui.input_int(im_str!("id"), &mut id).build();
-                        id = if id < 0 { 0 } else if id > max { max } else { id };
+                        id = if id < 0 {
+                            0
+                        } else if id > max {
+                            max
+                        } else {
+                            id
+                        };
 
                         let mut selected_mut = vec![&mut self.models[id as usize].transform];
                         <Transform as imgui_inspect::InspectRenderStruct<Transform>>::render_mut(
