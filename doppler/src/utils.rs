@@ -14,9 +14,14 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
     let mut id = 0;
 
     gl::GenTextures(1, &mut id);
+    let content = io::read_u8(path);
+    if content.is_err() {
+        error!("Error: {:?}",content.err());
+        panic!();
+    }
     let (data, dim, format) = match file_format {
         "png" => {
-            let img: ImagePtr<u8, Rgba> = io::read_u8(path).unwrap();
+            let img: ImagePtr<u8, Rgba> = content.unwrap();
             let img_data = img.data().to_vec();
             let (x, y, _) = img.shape();
 

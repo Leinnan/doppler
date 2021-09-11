@@ -17,6 +17,12 @@ pub struct Model {
     directory: String,
 }
 
+impl Default for Model {
+    fn default() -> Self {
+        Model { meshes: Vec::new(), textures_loaded: Vec::new(), directory: "".to_string() }
+    }
+}
+
 impl Model {
     /// constructor, expects a filepath to a 3D model.
     pub fn new_ext(path: &str, diff_texture: Option<&str>, cache: &mut AssetsCache) -> Model {
@@ -34,10 +40,10 @@ impl Model {
 
         if pathObj.exists() {
             model.load_model(path, diff_texture, cache);
-        } else { 
+        } else {
             warn!("{} does not exist, returning empty model", path);
         }
-        
+
         model
     }
 
@@ -120,7 +126,7 @@ impl Model {
                 }
             // NOTE: no height maps
             } else if diffuse_path.is_some() {
-                // println!("Loading {}", &diffuse_path.unwrap());
+                println!("Loading {}", &diffuse_path.unwrap());
                 let texture = cache.get_material_texture(
                     &self.directory,
                     &diffuse_path.unwrap(),

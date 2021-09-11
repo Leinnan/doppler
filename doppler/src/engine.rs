@@ -217,6 +217,7 @@ impl Engine {
         let mut last_frame = std::time::Instant::now();
 
         let mut screensize = self.size;
+        info!("Assets loaded");
 
         event_loop.run(move |event, _, control_flow| {
             use glutin::event_loop::ControlFlow;
@@ -310,7 +311,6 @@ impl Engine {
 
                     #[cfg(feature = "imgui_inspect")]
                     if self.debug_layer {
-                        
                         let frames_vec = timestep.frames();
                         imgui.io_mut().display_size = [screensize.0 as f32, screensize.1 as f32];
                         let imgui_size = imgui.io().display_size;
