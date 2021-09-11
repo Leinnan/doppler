@@ -1,0 +1,115 @@
+objects:
+  - model_hash: 15116225178797259971
+    transform:
+      position:
+        x: 10.0
+        y: 0.0
+        z: 26.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 2.5
+  - model_hash: 12030087559729388911
+    transform:
+      position:
+        x: -9.0
+        y: 0.0
+        z: -15.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 2.5
+  - model_hash: 12030087559729388911
+    transform:
+      position:
+        x: 15.0
+        y: 0.0
+        z: -7.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 2.5
+  - model_hash: 10272171414862311589
+    transform:
+      position:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 0.56
+  - model_hash: 5402531760391502974
+    transform:
+      position:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 1.0
+  - model_hash: 4360533331876312021
+    transform:
+      position:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 1.0
+  - model_hash: 6024833582843300776
+    transform:
+      position:
+        x: 8.3
+        y: 0.0
+        z: 3.0
+      rotation:
+        x: 0.0
+        y: 120.0
+        z: 0.0
+      scale: 0.025
+  - model_hash: 12474845581084103280
+    transform:
+      position:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 1.0
+camera:
+  position:
+    x: 0.0
+    y: 8.0
+    z: 13.0
+  front:
+    x: 0.0
+    y: -0.4
+    z: -1.0
+  up:
+    x: 0.0
+    y: 1.0
+    z: -0.4
+  right:
+    x: 1.0
+    y: 0.0
+    z: 0.0
+  worldup:
+    x: 0.0
+    y: 1.0
+    z: 0.0
+  yaw: -90.0
+  pitch: -20.0
+  movement_speed: 0.5
+  mouse_sensivity: 0.1
+  zoom: 45.0

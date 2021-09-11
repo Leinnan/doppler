@@ -25,3 +25,4 @@ pub mod model;
 pub mod shader;
 pub mod sky;
 pub mod utils;
+pub mod map;

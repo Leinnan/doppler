@@ -43,6 +43,7 @@ impl Transform {
 
 pub struct ModelComponent {
     pub model: Model,
+    pub hash: u64,
     pub transform: Transform,
 }
 

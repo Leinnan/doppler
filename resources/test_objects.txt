@@ -1,0 +1,8 @@
+resources/objects/ground/ground.obj
+resources/objects/robot/robot.obj
+resources/objects/grass/grass.obj foliage.png
+resources/objects/gaz_tank/gaz_tank.obj
+resources/objects/tree/tree_6_d.obj tree_e.png
+resources/objects/tree/tree_6_c.obj tree_e.png
+resources/objects/tree/tree_6_c.obj tree_e.png
+resources/objects/ruins/ruins.obj

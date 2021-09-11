@@ -3,6 +3,7 @@
 #[cfg(feature = "imgui_inspect")]
 use crate::imgui_helper::*;
 use cgmath;
+use serde::{Deserialize, Serialize};
 use cgmath::prelude::*;
 use cgmath::vec3;
 #[cfg(feature = "imgui_inspect")]
@@ -31,7 +32,7 @@ const SPEED: f32 = 0.5;
 const SENSITIVTY: f32 = 0.1;
 const ZOOM: f32 = 45.0;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 #[cfg_attr(feature = "imgui_inspect", derive(Inspect))]
 pub struct Camera {
     // Camera Attributes
