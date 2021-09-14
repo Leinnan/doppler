@@ -12,6 +12,7 @@ pub struct ExampleClient {
     delta: f32,
     show_object_info: bool,
     show_camera_info: bool,
+    imgui_grabs_input: bool,
     object_info_id: i32,
     show_light_info: bool,
     light_info_id: i32,
@@ -26,6 +27,7 @@ impl Default for ExampleClient {
             show_camera_info: false,
             show_object_info: false,
             show_light_info: false,
+            imgui_grabs_input: false,
             light_info_id: 0,
         }
     }
@@ -189,12 +191,21 @@ impl Client for ExampleClient {
                 self.show_light_info = show_window;
             }
         }
+        self.imgui_grabs_input = ui.is_any_item_hovered() || ui.is_any_item_focused();
     }
 
     fn on_mouse_scroll(&mut self, yoffset: f32) {
+        if self.imgui_grabs_input {
+            println!("DD");
+            return;
+        }
         self.map.camera.process_mouse_scroll(yoffset as f32);
     }
     fn on_mouse_move(&mut self, x: f32, y: f32) {
+        if self.imgui_grabs_input {
+            println!("DD");
+            return;
+        }
         self.map.camera.process_mouse_movement(x, y, true);
     }
 }

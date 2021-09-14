@@ -64,8 +64,13 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
 
 pub unsafe fn load_texture_from_dir(filename: &str, directory: &str) -> u32 {
     let fullpath = format!("{}/{}", directory, filename);
-    let dot = filename.find(".").unwrap_or_default() + 1usize;
-    let (_, format) = filename.split_at(dot);
+
+    load_texture_from_fullpath(&fullpath)
+}
+
+pub unsafe fn load_texture_from_fullpath(fullpath: &str) -> u32 {
+    let dot = fullpath.find(".").unwrap_or_default() + 1usize;
+    let (_, format) = fullpath.split_at(dot);
 
     load_texture(&fullpath, format)
 }

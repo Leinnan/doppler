@@ -28,8 +28,17 @@ impl Default for Model {
 }
 
 impl Model {
+    pub fn new_2d(cache: &mut AssetsCache) -> Model {
+        Self::new_ext("resources/defaults/plane.obj", None, cache, true)
+    }
+
     /// constructor, expects a filepath to a 3D model.
-    pub fn new_ext(path: &str, diff_texture: Option<&str>, cache: &mut AssetsCache) -> Model {
+    pub fn new_ext(
+        path: &str,
+        diff_texture: Option<&str>,
+        cache: &mut AssetsCache,
+        skip_textures: bool,
+    ) -> Model {
         let pathObj = Path::new(path);
         let mut model = Model {
             meshes: Vec::<Mesh>::new(),
@@ -43,7 +52,7 @@ impl Model {
         };
 
         if pathObj.exists() {
-            model.load_model(path, diff_texture, cache);
+            model.load_model(path, diff_texture, cache, skip_textures);
         } else {
             warn!("{} does not exist, returning empty model", path);
         }
@@ -52,7 +61,7 @@ impl Model {
     }
 
     pub fn new(path: &str, cache: &mut AssetsCache) -> Model {
-        Model::new_ext(path, None, cache)
+        Model::new_ext(path, None, cache, false)
     }
 
     pub fn Draw(&self, shader: &Shader) {
@@ -64,7 +73,13 @@ impl Model {
     }
 
     // loads a model from file and stores the resulting meshes in the meshes vector.
-    fn load_model(&mut self, path: &str, diffuse_path: Option<&str>, cache: &mut AssetsCache) {
+    fn load_model(
+        &mut self,
+        path: &str,
+        diffuse_path: Option<&str>,
+        cache: &mut AssetsCache,
+        skip_textures: bool,
+    ) {
         let path = Path::new(path);
         // println!("Started loading model from path: {}", path.display());
 
@@ -98,47 +113,61 @@ impl Model {
 
             // process material
             let mut textures = Vec::new();
-            if let Some(material_id) = mesh.material_id {
-                let material = &materials[material_id];
 
-                // 1. diffuse map
-                if !material.diffuse_texture.is_empty() {
+            if !skip_textures {
+                if let Some(material_id) = mesh.material_id {
+                    let material = &materials[material_id];
+
+                    // 1. diffuse map
+                    if !material.diffuse_texture.is_empty() {
+                        let texture = cache.get_material_texture(
+                            &self.directory,
+                            &material.diffuse_texture,
+                            "texture_diffuse",
+                        );
+                        textures.push(texture);
+                    }
+                    // 2. specular map
+                    if !material.specular_texture.is_empty() {
+                        let texture = cache.get_material_texture(
+                            &self.directory,
+                            &material.specular_texture,
+                            "texture_specular",
+                        );
+                        textures.push(texture);
+                    }
+                    // 3. normal map
+                    if !material.normal_texture.is_empty() {
+                        let texture = cache.get_material_texture(
+                            &self.directory,
+                            &material.normal_texture,
+                            "texture_normal",
+                        );
+                        textures.push(texture);
+                    }
+                // NOTE: no height maps
+                } else if diffuse_path.is_some() {
+                    let path = diffuse_path.unwrap();
+                    println!("Loading {}", path);
+                    let dir: String = if path.contains("/") {
+                        Path::new(&path)
+                            .parent()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                            .to_string()
+                    } else {
+                        self.directory.to_string()
+                    };
                     let texture = cache.get_material_texture(
                         &self.directory,
-                        &material.diffuse_texture,
+                        &diffuse_path.unwrap(),
                         "texture_diffuse",
                     );
                     textures.push(texture);
+                } else {
+                    warn!("There are no materials for: {}", path.display());
                 }
-                // 2. specular map
-                if !material.specular_texture.is_empty() {
-                    let texture = cache.get_material_texture(
-                        &self.directory,
-                        &material.specular_texture,
-                        "texture_specular",
-                    );
-                    textures.push(texture);
-                }
-                // 3. normal map
-                if !material.normal_texture.is_empty() {
-                    let texture = cache.get_material_texture(
-                        &self.directory,
-                        &material.normal_texture,
-                        "texture_normal",
-                    );
-                    textures.push(texture);
-                }
-            // NOTE: no height maps
-            } else if diffuse_path.is_some() {
-                println!("Loading {}", &diffuse_path.unwrap());
-                let texture = cache.get_material_texture(
-                    &self.directory,
-                    &diffuse_path.unwrap(),
-                    "texture_diffuse",
-                );
-                textures.push(texture);
-            } else {
-                warn!("There are no materials for: {}", path.display());
             }
 
             self.meshes.push(Mesh::new(vertices, indices, textures));

@@ -5,6 +5,7 @@ use log::{error, info};
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::hash::{Hash, Hasher};
+use std::path::Path;
 
 #[derive(Default)]
 pub struct AssetsCache {
@@ -13,6 +14,23 @@ pub struct AssetsCache {
 }
 
 impl AssetsCache {
+    pub fn load_2d(&mut self, path: &str) -> Model {
+        let fullpath = Path::new(&path);
+        let dir = fullpath
+            .parent()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_string();
+        let filename = fullpath.file_name().unwrap().to_str().unwrap();
+        let texture = self.get_material_texture(&dir, &filename, "texture_diffuse");
+        let mut model = Model::new_2d( self);
+        for ele in &mut model.meshes {
+            ele.textures.push(texture.clone())
+        }
+        model
+    }
+
     pub fn load_all_from_file(&mut self, path: &str) {
         let path = std::path::Path::new(path);
         let meta = std::fs::metadata(path);
@@ -70,7 +88,7 @@ impl AssetsCache {
     fn load_model_ext(&mut self, path: &str, diff_texture: Option<&str>) {
         let hash = Self::path_hash(path);
         info!("Loading model: {}({})", path, hash);
-        let model = Model::new_ext(path, diff_texture, self);
+        let model = Model::new_ext(path, diff_texture, self, false);
         self.models.insert(hash, model);
     }
 

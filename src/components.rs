@@ -1,3 +1,5 @@
+use std::default;
+
 #[cfg(feature = "imgui_inspect")]
 use crate::imgui_helper::*;
 use crate::model::Model;
@@ -45,6 +47,16 @@ pub struct ModelComponent {
     pub model: Model,
     pub hash: u64,
     pub transform: Transform,
+}
+
+impl Default for ModelComponent {
+    fn default() -> Self {
+        ModelComponent {
+            model: Model::default(),
+            hash: u64::default(),
+            transform: Transform::default(),
+        }
+    }
 }
 
 impl ModelComponent {

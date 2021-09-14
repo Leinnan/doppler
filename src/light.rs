@@ -101,7 +101,7 @@ impl Default for DirectionalLight {
         DirectionalLight {
             direction: vec3(-0.3, -1.0, -0.3),
             ambient: vec3(0.05, 0.05, 0.05),
-            diffuse: vec3(0.4, 0.4, 0.4),
+            diffuse: vec3(0.9, 0.9, 0.8),
             specular: vec3(0.5, 0.5, 0.5),
         }
     }

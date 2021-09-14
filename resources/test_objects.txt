@@ -1,8 +1,11 @@
 resources/objects/ground/ground.obj
 resources/objects/robot/robot.obj
 resources/objects/grass/grass.obj foliage.png
-resources/objects/gaz_tank/gaz_tank.obj
 resources/objects/tree/tree_6_d.obj tree_e.png
 resources/objects/tree/tree_6_c.obj tree_e.png
 resources/objects/tree/tree_6_c.obj tree_e.png
-resources/objects/ruins/ruins.obj
+resources/objects/citypack/policeman.obj
+resources/objects/sclavinia/wapienne_skaly.obj wapno.png
+resources/objects/sclavinia/wapienne_skaly_2.obj wapno.png
+resources/objects/sclavinia/wapienne_skaly_3.obj wapno.png
+resources/objects/sclavinia/chata_zniszczona_1.obj palev2.png

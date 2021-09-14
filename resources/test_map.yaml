@@ -54,28 +54,6 @@ objects:
         y: 0.0
         z: 0.0
       scale: 1.0
-  - model_hash: 4360533331876312021
-    transform:
-      position:
-        x: 0.0
-        y: 0.0
-        z: 0.0
-      rotation:
-        x: 0.0
-        y: 0.0
-        z: 0.0
-      scale: 1.0
-  - model_hash: 6024833582843300776
-    transform:
-      position:
-        x: 8.3
-        y: 0.0
-        z: 3.0
-      rotation:
-        x: 0.0
-        y: 120.0
-        z: 0.0
-      scale: 0.025
   - model_hash: 12474845581084103280
     transform:
       position:
@@ -87,6 +65,61 @@ objects:
         y: 0.0
         z: 0.0
       scale: 1.0
+  - model_hash: 7463349984896526650
+    transform:
+      position:
+        x: 2.0
+        y: 0.0
+        z: 0.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 1.0
+  - model_hash: 13800530402659272349
+    transform:
+      position:
+        x: 44.0
+        y: 0.0
+        z: 33.0
+      rotation:
+        x: 0.0
+        y: 128.0
+        z: 0.0
+      scale: 3.0
+  - model_hash: 10609347989321310959
+    transform:
+      position:
+        x: 55.0
+        y: 0.0
+        z: -28.0
+      rotation:
+        x: 0.0
+        y: -67.0
+        z: 0.0
+      scale: 2.0
+  - model_hash: 14496278726830200225
+    transform:
+      position:
+        x: 39.0
+        y: 0.0
+        z: -39.0
+      rotation:
+        x: -12.0
+        y: 70.0
+        z: 30.0
+      scale: 1.5
+  - model_hash: 448611579693571817
+    transform:
+      position:
+        x: 11.0
+        y: 0.0
+        z: -40.0
+      rotation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      scale: 2.0
 camera:
   position:
     x: 0.0

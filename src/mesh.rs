@@ -10,6 +10,7 @@ use cgmath::prelude::*;
 use cgmath::{Vector2, Vector3};
 use gl;
 
+use crate::assets_cache::AssetsCache;
 use crate::shader::Shader;
 
 // NOTE: without repr(C) the compiler may reorder the fields or use different padding/alignment than C.
@@ -90,7 +91,6 @@ impl Mesh {
             VBO: 0,
             EBO: 0,
         };
-
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         unsafe { mesh.setupMesh() }
         mesh
