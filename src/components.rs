@@ -1,5 +1,3 @@
-use std::default;
-
 #[cfg(feature = "imgui_inspect")]
 use crate::imgui_helper::*;
 use crate::model::Model;

@@ -160,7 +160,7 @@ impl Model {
                         self.directory.to_string()
                     };
                     let texture = cache.get_material_texture(
-                        &self.directory,
+                        &dir,
                         &diffuse_path.unwrap(),
                         "texture_diffuse",
                     );

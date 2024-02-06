@@ -10,7 +10,6 @@ use cgmath::prelude::*;
 use cgmath::{Vector2, Vector3};
 use gl;
 
-use crate::assets_cache::AssetsCache;
 use crate::shader::Shader;
 
 // NOTE: without repr(C) the compiler may reorder the fields or use different padding/alignment than C.

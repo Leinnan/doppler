@@ -1,9 +1,7 @@
 use doppler::assets_cache::AssetsCache;
-use doppler::camera::*;
 use doppler::client::Client;
 use doppler::glutin::event::{ElementState, VirtualKeyCode};
 use doppler::shader::Shader;
-use doppler::map::*;
 use doppler::components::*;
 
 pub struct Client2D{
@@ -43,7 +41,7 @@ impl Client for Client2D {
     }
 
     unsafe fn draw(&mut self) {
-        use doppler::math::prelude::*;
+        // use doppler::math::prelude::*;
         self.models_2d.draw(&self.shader);
         // let projection: Matrix4<f32> = perspective(
         //     Deg(self.camera.zoom),
@@ -57,13 +55,13 @@ impl Client for Client2D {
         self.delta = delta;
     }
 
-    fn debug_draw(&mut self, ui: &doppler::imgui::Ui) {
+    fn debug_draw(&mut self, _ui: &doppler::imgui::Ui) {
     }
 
-    fn on_mouse_scroll(&mut self, yoffset: f32) {
+    fn on_mouse_scroll(&mut self, _yoffset: f32) {
     }
 
-    fn on_mouse_move(&mut self, x: f32, y: f32) {
+    fn on_mouse_move(&mut self, _x: f32, _y: f32) {
     }
 }
 
