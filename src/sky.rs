@@ -67,7 +67,7 @@ impl Sky {
         shader.setInt(c_str!("skybox"), 0);
 
         Sky {
-            shader: shader,
+            shader,
             texture_id: cubemap_texture,
             vao: skybox_vao,
             vbo: skybox_vbo,

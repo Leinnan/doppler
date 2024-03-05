@@ -149,7 +149,7 @@ impl Model {
                 } else if diffuse_path.is_some() {
                     let path = diffuse_path.unwrap();
                     println!("Loading {}", path);
-                    let dir: String = if path.contains("/") {
+                    let dir: String = if path.contains('/') {
                         Path::new(&path)
                             .parent()
                             .unwrap()
@@ -159,11 +159,8 @@ impl Model {
                     } else {
                         self.directory.to_string()
                     };
-                    let texture = cache.get_material_texture(
-                        &dir,
-                        &diffuse_path.unwrap(),
-                        "texture_diffuse",
-                    );
+                    let texture =
+                        cache.get_material_texture(&dir, diffuse_path.unwrap(), "texture_diffuse");
                     textures.push(texture);
                 } else {
                     warn!("There are no materials for: {}", path.display());

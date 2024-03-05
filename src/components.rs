@@ -41,27 +41,20 @@ impl Transform {
     }
 }
 
+#[derive(Default)]
 pub struct ModelComponent {
     pub model: Model,
     pub hash: u64,
     pub transform: Transform,
 }
 
-impl Default for ModelComponent {
-    fn default() -> Self {
-        ModelComponent {
-            model: Model::default(),
-            hash: u64::default(),
-            transform: Transform::default(),
-        }
-    }
-}
+
 
 impl ModelComponent {
     pub unsafe fn draw(&self, shader: &Shader) {
         let matrix = self.transform.get_matrix();
 
         shader.set_mat4(c_str!("model"), &matrix);
-        self.model.Draw(&shader);
+        self.model.Draw(shader);
     }
 }

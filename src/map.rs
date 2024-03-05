@@ -30,8 +30,8 @@ impl MapSave {
             });
         }
         let ms = MapSave {
-            camera: map.camera.clone(),
-            objects: objects,
+            camera: map.camera,
+            objects,
         };
         match serde_yaml::to_string(&ms) {
             Ok(result) => println!("{}", result),
@@ -96,7 +96,7 @@ impl Default for Map {
                 ..Camera::default()
             },
             lighting_system: LightingSystem::default(),
-            sky: sky,
+            sky,
         }
     }
 }

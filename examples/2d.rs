@@ -1,13 +1,13 @@
 use doppler::assets_cache::AssetsCache;
 use doppler::client::Client;
+use doppler::components::*;
 use doppler::glutin::event::{ElementState, VirtualKeyCode};
 use doppler::shader::Shader;
-use doppler::components::*;
 
-pub struct Client2D{
+pub struct Client2D {
     delta: f32,
     models_2d: ModelComponent,
-    shader: Shader
+    shader: Shader,
 }
 
 impl Default for Client2D {
@@ -18,11 +18,10 @@ impl Default for Client2D {
             shader: Shader::from_file(
                 "resources/shaders/multiple_lights.vs",
                 "resources/shaders/multiple_lights.fs",
-            )
+            ),
         }
     }
 }
-
 
 impl Client for Client2D {
     fn on_keyboard(&mut self, code: &VirtualKeyCode, state: &ElementState) {
@@ -55,14 +54,9 @@ impl Client for Client2D {
         self.delta = delta;
     }
 
-    fn debug_draw(&mut self, _ui: &doppler::imgui::Ui) {
-    }
+    fn on_mouse_scroll(&mut self, _yoffset: f32) {}
 
-    fn on_mouse_scroll(&mut self, _yoffset: f32) {
-    }
-
-    fn on_mouse_move(&mut self, _x: f32, _y: f32) {
-    }
+    fn on_mouse_move(&mut self, _x: f32, _y: f32) {}
 }
 
 pub fn main() {

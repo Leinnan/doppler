@@ -41,8 +41,8 @@ pub unsafe fn load_texture(path: &str, file_format: &str) -> u32 {
         gl::TEXTURE_2D,
         0,
         format as i32,
-        dim.0 as i32,
-        dim.1 as i32,
+        dim.0,
+        dim.1,
         0,
         format,
         gl::UNSIGNED_BYTE,
@@ -69,10 +69,10 @@ pub unsafe fn load_texture_from_dir(filename: &str, directory: &str) -> u32 {
 }
 
 pub unsafe fn load_texture_from_fullpath(fullpath: &str) -> u32 {
-    let dot = fullpath.find(".").unwrap_or_default() + 1usize;
+    let dot = fullpath.find('.').unwrap_or_default() + 1usize;
     let (_, format) = fullpath.split_at(dot);
 
-    load_texture(&fullpath, format)
+    load_texture(fullpath, format)
 }
 
 /// loads a cubemap texture from 6 individual texture faces

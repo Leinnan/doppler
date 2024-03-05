@@ -22,6 +22,12 @@ pub struct TimeStep {
     frames: VecDeque<f32>,
 }
 
+impl Default for TimeStep {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TimeStep {
     pub fn frames(&self) -> Vec<f32> {
         self.frames.clone().into()
@@ -207,7 +213,7 @@ impl Engine {
         info!("Creating AssetCache");
         let mut assets_cache = AssetsCache::default();
         info!("Creating client");
-        let mut client = Box::new(T::default());
+        let mut client = Box::<T>::default();
         client.load_assets(&mut assets_cache);
         let mut first_mouse = true;
         let mut last_x: f32 = consts::SCR_WIDTH as f32 / 2.0;
@@ -215,7 +221,7 @@ impl Engine {
 
         // timing
         let mut timestep = TimeStep::new();
-        let mut last_frame = std::time::Instant::now();
+        let _last_frame = std::time::Instant::now();
 
         let mut screensize = self.size;
         info!("Assets loaded");
@@ -245,7 +251,7 @@ impl Engine {
                         .expect("Failed to prepare frame");
                     gl_window.window().request_redraw();
                 }
-                Event::LoopDestroyed => return,
+                Event::LoopDestroyed => (),
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::MouseWheel { delta, .. } => {
                         use glutin::event::MouseScrollDelta;
@@ -372,7 +378,7 @@ impl Engine {
 
                                 ui.text(output);
                             });
-                        platform.prepare_render(&ui, &gl_window.window());
+                        platform.prepare_render(&ui, gl_window.window());
                         renderer.render(ui);
                     }
                     gl_window.swap_buffers().unwrap();

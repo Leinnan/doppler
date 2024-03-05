@@ -1,10 +1,12 @@
 pub extern crate gl;
+#[cfg(feature = "imgui_inspect")]
 pub extern crate imgui;
 pub extern crate log;
 pub extern crate simple_logging;
 
 pub use cgmath as math;
 pub use glutin;
+#[cfg(feature = "imgui_inspect")]
 pub use imgui_inspect;
 pub use serde;
 

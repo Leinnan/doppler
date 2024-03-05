@@ -16,15 +16,10 @@ pub struct AssetsCache {
 impl AssetsCache {
     pub fn load_2d(&mut self, path: &str) -> Model {
         let fullpath = Path::new(&path);
-        let dir = fullpath
-            .parent()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_string();
+        let dir = fullpath.parent().unwrap().to_str().unwrap().to_string();
         let filename = fullpath.file_name().unwrap().to_str().unwrap();
-        let texture = self.get_material_texture(&dir, &filename, "texture_diffuse");
-        let mut model = Model::new_2d( self);
+        let texture = self.get_material_texture(&dir, filename, "texture_diffuse");
+        let mut model = Model::new_2d(self);
         for ele in &mut model.meshes {
             ele.textures.push(texture.clone())
         }
@@ -34,7 +29,7 @@ impl AssetsCache {
     pub fn load_all_from_file(&mut self, path: &str) {
         let path = std::path::Path::new(path);
         let meta = std::fs::metadata(path);
-        if !meta.is_ok() {
+        if meta.is_err() {
             error!("There is no assets file");
             return;
         }
@@ -50,7 +45,7 @@ impl AssetsCache {
         for line in lines {
             let mut splitted = line.split_whitespace();
             let path = splitted.next();
-            if path.is_none() || self.has_model(&path.unwrap()) {
+            if path.is_none() || self.has_model(path.unwrap()) {
                 error!("Skip wrong line: {}", line);
                 continue;
             }
@@ -79,10 +74,7 @@ impl AssetsCache {
     }
 
     pub fn get_model_by_hash(&mut self, hash: &u64) -> Option<Model> {
-        match self.models.get(hash) {
-            Some(model) => Some(model.clone()),
-            None => None,
-        }
+        self.models.get(hash).cloned()
     }
 
     fn load_model_ext(&mut self, path: &str, diff_texture: Option<&str>) {

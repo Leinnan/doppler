@@ -148,11 +148,11 @@ impl FramebufferSystem {
         info!("New framebuffer generated");
 
         FramebufferSystem {
-            texture_color_buffer: texture_color_buffer,
-            shader: shader,
+            texture_color_buffer,
+            shader,
             vao: quad_vao,
             vbo: quad_vbo,
-            framebuffer: framebuffer,
+            framebuffer,
         }
     }
 }
